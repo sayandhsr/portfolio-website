@@ -21,14 +21,14 @@ const CommLink = () => {
       
       <div className="matcha-container">
         <a 
-          href="https://buy.stripe.com/test_placeholder" 
+          href="upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR" 
           target="_blank" 
           rel="noopener noreferrer"
           className="brutalist-button matcha-btn"
         >
           🍵 BUY ME A MATCHA
         </a>
-        <span className="matcha-note">OR USE COMMAND `&gt; execute tip_matcha.sh`</span>
+        <p className="matcha-note" style={{marginTop: '1rem'}}>[ DIRECT SECURE TRANSFER: sayandhsr123-2@okicici ]</p>
       </div>
 
       <div className="comm-grid">

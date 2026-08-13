@@ -122,10 +122,10 @@ const UNIXTerminal = () => {
       return;
     }
     
-    if (userMsg.toLowerCase() === '> execute tip_matcha.sh') {
-      setMessages(prev => [...prev, { sender: 'system', text: `EXECUTING PAYMENT PROTOCOL...`, typing: true }]);
+    if (userMsg.toLowerCase() === '> execute tip_matcha.sh' || ["tip", "donate", "matcha"].includes(userMsg.toLowerCase().replace('>', '').trim())) {
+      setMessages(prev => [...prev, { sender: 'system', text: `ROUTE SECURE PAYMENT TO UPI ID: sayandhsr123-2@okicici`, typing: true }]);
       setTimeout(() => {
-        window.open('https://buy.stripe.com/test_placeholder', '_blank');
+        window.open('upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR', '_blank');
       }, 1500);
       return;
     }
