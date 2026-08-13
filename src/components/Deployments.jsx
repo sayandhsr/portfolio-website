@@ -35,20 +35,45 @@ const Deployments = () => {
   const itemsRef = useRef([]);
 
   useEffect(() => {
-    itemsRef.current.forEach((item, index) => {
-      gsap.fromTo(item,
-        { opacity: 0, x: index % 2 === 0 ? -100 : 100 },
-        {
-          opacity: 1, x: 0,
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 85%',
-            end: 'top 50%',
-            scrub: 1
+    let mm = gsap.matchMedia();
+
+    mm.add("(min-width: 768px)", () => {
+      // Heavy slide-ins for desktop
+      itemsRef.current.forEach((item, index) => {
+        gsap.fromTo(item,
+          { opacity: 0, x: index % 2 === 0 ? -100 : 100 },
+          {
+            opacity: 1, x: 0,
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 85%',
+              end: 'top 50%',
+              scrub: 1
+            }
           }
-        }
-      );
+        );
+      });
     });
+
+    mm.add("(max-width: 767px)", () => {
+      // Simpler, less aggressive animation for mobile to prevent layout thrashing
+      itemsRef.current.forEach((item) => {
+        gsap.fromTo(item,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1, y: 0,
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 90%',
+              end: 'top 60%',
+              scrub: 1
+            }
+          }
+        );
+      });
+    });
+
+    return () => mm.revert();
   }, []);
 
   return (

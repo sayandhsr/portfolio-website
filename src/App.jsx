@@ -10,6 +10,7 @@ import EngineComponents from './components/EngineComponents';
 import Verifications from './components/Verifications';
 import CommLink from './components/CommLink';
 import UNIXTerminal from './components/UNIXTerminal';
+import CustomCursor from './components/CustomCursor';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +20,7 @@ function App() {
 
   return (
     <main className="portfolio-container">
+      <CustomCursor />
       <HeroTerminal />
       <TheArchitect />
       <Deployments />

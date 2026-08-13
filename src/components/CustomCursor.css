@@ -1,0 +1,27 @@
+/* Hide default cursor on desktop */
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  
+  a, button, input, textarea {
+    cursor: none !important;
+  }
+}
+
+.custom-cursor-block {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background-color: white; /* Will invert against background */
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 9999;
+  /* Center the block on the actual mouse pointer */
+  margin-top: -12px;
+  margin-left: -12px;
+  transition: transform 0.05s linear; /* Smooth micro-easing */
+  will-change: transform;
+}

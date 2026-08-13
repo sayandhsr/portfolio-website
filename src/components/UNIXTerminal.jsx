@@ -1,21 +1,42 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { auth, db, googleProvider, githubProvider } from '../firebaseConfig';
+import { auth, db, googleProvider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './UNIXTerminal.css';
 
-// System prompt injected silently
 const SYSTEM_PROMPT = `You are the personal AI agent of Sayandh Raj, an elite AI Engineer & Data Architect. 
 You speak in a concise, technical, and slightly robotic terminal style. 
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
 Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
 Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena.`;
 
-// Typewriter component for terminal effect
-const TypewriterText = ({ text, onComplete }) => {
+// Typewriter component with Web Audio API Integration
+const TypewriterText = ({ text, onComplete, audioEnabled, audioCtxRef }) => {
   const [displayed, setDisplayed] = useState('');
   const index = useRef(0);
+
+  const playTick = useCallback(() => {
+    if (!audioEnabled || !audioCtxRef.current) return;
+    try {
+      const osc = audioCtxRef.current.createOscillator();
+      const gain = audioCtxRef.current.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(800, audioCtxRef.current.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(400, audioCtxRef.current.currentTime + 0.05);
+      
+      gain.gain.setValueAtTime(0.05, audioCtxRef.current.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtxRef.current.currentTime + 0.05);
+      
+      osc.connect(gain);
+      gain.connect(audioCtxRef.current.destination);
+      
+      osc.start();
+      osc.stop(audioCtxRef.current.currentTime + 0.05);
+    } catch (e) {
+      // Ignore audio errors if context is suspended
+    }
+  }, [audioEnabled, audioCtxRef]);
 
   useEffect(() => {
     index.current = 0;
@@ -23,20 +44,24 @@ const TypewriterText = ({ text, onComplete }) => {
     const timer = setInterval(() => {
       if (index.current < text.length) {
         setDisplayed(prev => prev + text.charAt(index.current));
+        playTick();
         index.current++;
       } else {
         clearInterval(timer);
         if (onComplete) onComplete();
       }
-    }, 15); // Fast terminal speed
+    }, 15);
     return () => clearInterval(timer);
-  }, [text, onComplete]);
+  }, [text, onComplete, playTick]);
 
   return <span>{displayed}</span>;
 };
 
 const UNIXTerminal = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const audioCtxRef = useRef(null);
+
   const [messages, setMessages] = useState([
     { sender: 'system', text: 'INIT SYSTEM...', typing: false },
     { sender: 'system', text: 'AWAITING COMMAND.', typing: false }
@@ -44,6 +69,18 @@ const UNIXTerminal = () => {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const endOfMessagesRef = useRef(null);
+
+  useEffect(() => {
+    // Initialize Audio Context on first interaction
+    const initAudio = () => {
+      if (!audioCtxRef.current) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtxRef.current = new AudioContext();
+      }
+    };
+    window.addEventListener('click', initAudio, { once: true });
+    return () => window.removeEventListener('click', initAudio);
+  }, []);
 
   const toggleTerminal = () => setIsOpen(!isOpen);
 
@@ -93,11 +130,20 @@ const UNIXTerminal = () => {
       return;
     }
 
+    if (userMsg.toLowerCase() === '> toggle_audio') {
+      const newState = !audioEnabled;
+      setAudioEnabled(newState);
+      if (newState && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      setMessages(prev => [...prev, { sender: 'system', text: `AUDIO MODULE ${newState ? 'ONLINE' : 'OFFLINE'}.`, typing: true }]);
+      return;
+    }
+
     setIsProcessing(true);
     let replyText = '';
 
     try {
-      // 1. Try Gemini First
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) throw new Error("NO_GEMINI_KEY");
       
@@ -108,7 +154,6 @@ const UNIXTerminal = () => {
       replyText = result.response.text();
     } catch (err) {
       console.warn("Gemini Failed, falling back to OpenRouter", err);
-      // 2. Fallback to OpenRouter
       try {
         const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
         if (!orKey) throw new Error("NO_OPENROUTER_KEY");
@@ -120,7 +165,7 @@ const UNIXTerminal = () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "google/gemini-pro", // or fallback model
+            model: "google/gemini-pro",
             messages: [
               { role: "system", content: SYSTEM_PROMPT },
               { role: "user", content: userMsg }
@@ -159,6 +204,7 @@ const UNIXTerminal = () => {
         <div className="terminal-window">
           <div className="terminal-header">
             <span>root@sayandh-node:~</span>
+            <span>[AUDIO: {audioEnabled ? 'ON' : 'OFF'}]</span>
             <button className="terminal-close" onClick={toggleTerminal}>[X]</button>
           </div>
           
@@ -170,7 +216,12 @@ const UNIXTerminal = () => {
                 </span>
                 <span className="t-text">
                   {msg.typing ? (
-                    <TypewriterText text={msg.text} onComplete={() => markTypingComplete(idx)} />
+                    <TypewriterText 
+                      text={msg.text} 
+                      onComplete={() => markTypingComplete(idx)}
+                      audioEnabled={audioEnabled}
+                      audioCtxRef={audioCtxRef}
+                    />
                   ) : (
                     msg.text
                   )}
