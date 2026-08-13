@@ -56,3 +56,38 @@
   padding-top: 2rem;
   border-top: 4px dashed var(--asphalt-black);
 }
+
+.matcha-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.matcha-btn {
+  width: 100%;
+  max-width: 400px;
+  font-size: 1.5rem;
+  padding: 1rem;
+  white-space: normal;
+  word-wrap: break-word;
+  text-decoration: none;
+}
+
+.matcha-note {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: bold;
+  opacity: 0.8;
+  word-wrap: break-word;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .matcha-btn {
+    font-size: 1.2rem;
+  }
+}
