@@ -82,7 +82,7 @@ const Deployments = () => {
 
   return (
     <section ref={sectionRef} className="section-container deployments-section">
-      <h2 className="section-header dark-bg-header">DEPLOYMENTS</h2>
+      <h2 className="section-header dark-bg-header">EXPERIENCE</h2>
       <div className="timeline-container">
         {deploymentsData.map((dep, idx) => {
           const content = (
