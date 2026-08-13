@@ -5,11 +5,20 @@ import { signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './UNIXTerminal.css';
 
-const SYSTEM_PROMPT = `You are the personal AI agent of Sayandh Raj, an elite AI/ML Engineer & Data Architect. 
+const getSystemPrompt = () => {
+  const date = new Date().toString();
+  return `You are the personal AI agent of Sayandh Raj, an elite AI/ML Engineer & Data Architect. 
 You speak in a concise, technical, and slightly robotic terminal style. 
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
 Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
-Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena.`;
+Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena.
+
+CRITICAL INSTRUCTIONS:
+1. You can answer general knowledge questions, conversational chats, and basic queries.
+2. The current system date/time is: ${date}. Use this if asked about the date, time, day, or month.
+3. Be highly forgiving of spelling mistakes and infer the user's intent.
+4. IF the user sends completely random gibberish, non-meaningful terms, or keyboard smashes (e.g. "asdf", "wefwwef", "fbiwefb"), you MUST start your response with "LOL" and include a short, humorous terminal error about their broken keyboard or brain.`;
+};
 
 // Typewriter component with Web Audio API Integration
 const TypewriterText = ({ text, onComplete, audioEnabled, audioCtxRef }) => {
@@ -195,9 +204,9 @@ const UNIXTerminal = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "google/gemini-flash-1.5",
+          model: "google/gemini-1.5-flash",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: getSystemPrompt() },
             { role: "user", content: userMsg }
           ]
         })
@@ -223,7 +232,7 @@ const UNIXTerminal = () => {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ 
           model: "gemini-1.5-flash", 
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
+          systemInstruction: { parts: [{ text: getSystemPrompt() }] }
         });
         
         const geminiPromise = model.generateContent(userMsg);
