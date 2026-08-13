@@ -1,14 +1,4 @@
-/* Hide default cursor on desktop */
-@media (pointer: fine) {
-  body {
-    cursor: none;
-  }
-  
-  a, button, input, textarea {
-    cursor: none !important;
-  }
-}
-
+/* Native cursor is kept visible globally for better UX */
 .custom-cursor-block {
   position: fixed;
   top: 0;
