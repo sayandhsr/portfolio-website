@@ -25,3 +25,10 @@
   transition: transform 0.05s linear; /* Smooth micro-easing */
   will-change: transform;
 }
+
+/* Disable the custom cursor on mobile / touch devices */
+@media (pointer: coarse), (max-width: 768px) {
+  .custom-cursor-block {
+    display: none !important;
+  }
+}
