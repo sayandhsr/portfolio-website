@@ -11,6 +11,7 @@ import Verifications from './components/Verifications';
 import CommLink from './components/CommLink';
 import UNIXTerminal from './components/UNIXTerminal';
 import CustomCursor from './components/CustomCursor';
+import AuthNav from './components/AuthNav';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <main className="portfolio-container">
+      <AuthNav />
       <CustomCursor />
       <HeroTerminal />
       <TheArchitect />

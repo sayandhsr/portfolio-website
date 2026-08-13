@@ -1,0 +1,93 @@
+.auth-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: rgba(5, 5, 5, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 3px solid var(--concrete-white);
+  padding: 0.6rem 2rem;
+}
+
+.auth-nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.auth-nav-label {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--accent-red);
+  letter-spacing: 2px;
+}
+
+.auth-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.auth-btn {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--concrete-white);
+  background: transparent;
+  color: var(--concrete-white);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.auth-btn:hover {
+  background: var(--concrete-white);
+  color: var(--asphalt-black);
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0px var(--accent-red);
+}
+
+.auth-signup {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.auth-signup:hover {
+  background: var(--accent-red);
+  color: var(--concrete-white);
+}
+
+.auth-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #00ff41;
+  letter-spacing: 2px;
+  padding-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .auth-nav {
+    padding: 0.5rem 1rem;
+  }
+
+  .auth-nav-label {
+    font-size: 0.7rem;
+  }
+
+  .auth-btn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .auth-status {
+    display: none;
+  }
+}
