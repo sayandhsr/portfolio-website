@@ -1,0 +1,31 @@
+.architect-section {
+  background-color: var(--concrete-white);
+  color: var(--asphalt-black);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section-header {
+  font-size: clamp(3rem, 10vw, 8rem);
+  margin-bottom: 3rem;
+  border-bottom: 8px solid var(--asphalt-black);
+  display: inline-block;
+  padding-bottom: 1rem;
+}
+
+.architect-content {
+  max-width: 1200px;
+}
+
+.architect-bio {
+  font-family: var(--font-mono);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  line-height: 1.6;
+  font-weight: 600;
+  border-left: 12px solid var(--accent-red);
+  padding-left: 2rem;
+  background: var(--industrial-cream);
+  padding: 2rem;
+  box-shadow: 12px 12px 0px var(--asphalt-black);
+}

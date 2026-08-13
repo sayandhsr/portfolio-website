@@ -1,0 +1,54 @@
+.verifications-section {
+  background-color: var(--asphalt-black);
+  color: var(--concrete-white);
+}
+
+.cert-list {
+  list-style-type: none;
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cert-item {
+  font-family: var(--font-mono);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  background: #111;
+  padding: 1rem 2rem;
+  border-left: 8px solid var(--concrete-white);
+  transition: padding-left 0.3s;
+}
+
+.cert-item:hover {
+  border-color: var(--accent-red);
+  padding-left: 3rem;
+  background: #1a1a1a;
+}
+
+.cert-indicator {
+  color: var(--accent-red);
+  margin-right: 1rem;
+}
+
+.db-access-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.massive-block-link {
+  display: inline-block;
+  text-decoration: none;
+  background: var(--concrete-white);
+  color: var(--asphalt-black);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  padding: 2rem 4rem;
+  border: 8px solid var(--asphalt-black);
+}
+
+.massive-block-link:hover {
+  background: var(--accent-red);
+  color: var(--concrete-white);
+  box-shadow: 15px 15px 0px var(--concrete-white);
+}
