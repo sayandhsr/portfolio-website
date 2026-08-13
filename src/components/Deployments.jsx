@@ -11,22 +11,26 @@ const deploymentsData = [
   {
     company: "TCS iON",
     role: "Applied Industry Project",
-    details: "End-to-End Cloud Big Data Solution for Real-Time Logistics Intelligence."
+    details: "End-to-End Cloud Big Data Solution for Real-Time Logistics Intelligence.",
+    url: "https://drive.google.com/file/d/1PaUBkPkdkWM6r0UbMbtRwC3ANRpt4TKP/view?usp=drive_link"
   },
   {
     company: "Networkers Home",
     role: "AI Engineering Internship",
-    details: "Engineered machine learning models for network optimization."
+    details: "Engineered machine learning models for network optimization.",
+    url: "https://drive.google.com/file/d/14CDnqWtqvgZdBRMsQfnHxQSejRQ_rW3H/view?usp=drive_link"
   },
   {
     company: "AISECT Learn",
     role: "Python for Data Science Internship",
-    details: "Built core data analytics pipelines and statistical models."
+    details: "Built core data analytics pipelines and statistical models.",
+    url: "https://drive.google.com/file/d/1FlF3gsDiORiWDPdoq1mZKw5H9y0BIHad/view?usp=drive_link"
   },
   {
     company: "The Developers Arena",
     role: "Software Development Internship",
-    details: "Developed robust software architecture and integrated scalable backends."
+    details: "Developed robust software architecture and integrated scalable backends.",
+    url: "https://drive.google.com/file/d/1tIRGmHjQig1_3QKwpW9yxTmygaZBNiWH/view?usp=drive_link"
   }
 ];
 
@@ -80,17 +84,36 @@ const Deployments = () => {
     <section ref={sectionRef} className="section-container deployments-section">
       <h2 className="section-header dark-bg-header">DEPLOYMENTS</h2>
       <div className="timeline-container">
-        {deploymentsData.map((dep, idx) => (
-          <div 
-            key={idx} 
-            className="deployment-block"
-            ref={el => itemsRef.current[idx] = el}
-          >
-            <div className="dep-company">{dep.company}</div>
-            <div className="dep-role">{dep.role}</div>
-            <div className="dep-details">{dep.details}</div>
-          </div>
-        ))}
+        {deploymentsData.map((dep, idx) => {
+          const content = (
+            <>
+              <div className="dep-company">{dep.company}</div>
+              <div className="dep-role">{dep.role}</div>
+              <div className="dep-details">{dep.details}</div>
+            </>
+          );
+          return dep.url ? (
+            <a
+              href={dep.url}
+              target="_blank"
+              rel="noreferrer"
+              key={idx} 
+              className="deployment-block"
+              style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              ref={el => itemsRef.current[idx] = el}
+            >
+              {content}
+            </a>
+          ) : (
+            <div 
+              key={idx} 
+              className="deployment-block"
+              ref={el => itemsRef.current[idx] = el}
+            >
+              {content}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

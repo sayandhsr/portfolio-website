@@ -54,7 +54,7 @@ const HeroTerminal = () => {
       <div className="hero-overlay"></div>
       <div className="hero-content">
         <h1 ref={textRef} className="massive-headline">SAYANDH RAJ</h1>
-        <h2 ref={subTextRef} className="sub-headline">AI ENGINEER & DATA ARCHITECT</h2>
+        <h2 ref={subTextRef} className="sub-headline">AI/ML ENGINEER & DATA ARCHITECT</h2>
         <button ref={btnRef} className="brutalist-button initialize-btn" onClick={handleScroll}>
           INITIALIZE PROTOCOL
         </button>

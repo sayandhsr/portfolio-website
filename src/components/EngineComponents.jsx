@@ -3,11 +3,13 @@ import gsap from 'gsap';
 import './EngineComponents.css';
 
 const skillCategories = [
-  { title: "CORE LANGUAGES", skills: ["Python", "SQL", "R"] },
-  { title: "MACHINE INTELLIGENCE", skills: ["Machine Learning", "NLP", "Computer Vision"] },
-  { title: "DATA ARCHITECTURE", skills: ["Data Science", "Analytics", "EDA", "Statistical Analysis", "Power BI", "Tableau", "Excel"] },
-  { title: "GENERATIVE AI", skills: ["LangChain", "Hugging Face", "OpenRouter", "RAG", "LLM Applications"] },
-  { title: "INFRASTRUCTURE", skills: ["Docker", "Firebase", "Supabase", "GitHub", "Vercel", "REST APIs"] }
+  { title: "MACHINE INTELLIGENCE & DEEP LEARNING", skills: ["PyTorch", "TensorFlow", "Deep Learning / Neural Networks", "Machine Learning", "NLP", "Computer Vision"] },
+  { title: "DATA SCIENCE LIBRARIES", skills: ["Pandas", "NumPy", "Scikit-Learn", "Matplotlib", "Seaborn"] },
+  { title: "DATA ANALYTICS & BI", skills: ["Power BI", "Excel", "Tableau (DAX)", "Data Cleaning", "Data Modelling & Visualisation", "Exploratory Data Analysis (EDA)"] },
+  { title: "MATHEMATICS FOR AI", skills: ["Linear Algebra", "Statistics and Probability", "Calculus"] },
+  { title: "LANGUAGES & CORE", skills: ["Python", "SQL", "R"] },
+  { title: "GENERATIVE AI & FRAMEWORKS", skills: ["LangChain", "Hugging Face", "OpenRouter", "RAG", "LLM Applications"] },
+  { title: "INFRASTRUCTURE, BACKEND & TOOLS", skills: ["FastAPI", "Docker", "Firebase", "Supabase", "GitHub", "Vercel", "REST APIs"] }
 ];
 
 const EngineComponents = () => {

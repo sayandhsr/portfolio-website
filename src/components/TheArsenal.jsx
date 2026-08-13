@@ -3,14 +3,14 @@ import gsap from 'gsap';
 import './TheArsenal.css';
 
 const projects = [
-  "ATS Resume Analyzer & AI Resume Builder",
-  "RAG-Based Document Chatbot with PDF Upload Support",
-  "AI Code Review Assistant & GitHub Repository Analyzer",
-  "AI Job Search Assistant, YouTube Video Summarizer & AI Helpdesk Chatbot",
-  "Precision Crop Forecasting System",
-  "Skin Disease Prediction using Machine Learning and OpenCV",
-  "Breast Cancer & House Price Prediction Models using Machine Learning",
-  "Social Media Trend Analysis"
+  { title: "ATS Resume Analyzer & AI Resume Builder", url: "https://github.com/sayandhsr" },
+  { title: "RAG-Based Document Chatbot with PDF Upload Support", url: "https://github.com/sayandhsr" },
+  { title: "AI Code Review Assistant & GitHub Repository Analyzer", url: "https://github.com/sayandhsr" },
+  { title: "AI Job Search Assistant, YouTube Video Summarizer & AI Helpdesk Chatbot", url: "https://github.com/sayandhsr" },
+  { title: "Precision Crop Forecasting System", url: "https://github.com/sayandhsr" },
+  { title: "Skin Disease Prediction using Machine Learning and OpenCV", url: "https://github.com/sayandhsr" },
+  { title: "Breast Cancer & House Price Prediction Models using Machine Learning", url: "https://github.com/sayandhsr" },
+  { title: "Social Media Trend Analysis", url: "https://github.com/sayandhsr" }
 ];
 
 const TheArsenal = () => {
@@ -38,17 +38,21 @@ const TheArsenal = () => {
       <h2 className="section-header dark-bg-header">THE ARSENAL</h2>
       <div className="masonry-grid">
         {projects.map((proj, idx) => (
-          <div 
+          <a 
+            href={proj.url}
+            target="_blank"
+            rel="noopener noreferrer"
             key={idx} 
             className="arsenal-card"
+            style={{ textDecoration: 'none' }}
             ref={el => cardsRef.current[idx] = el}
           >
             <div className="card-id">PRJ_{idx < 9 ? '0' : ''}{idx + 1}</div>
-            <h3 className="card-title">{proj}</h3>
+            <h3 className="card-title">{proj.title}</h3>
             <div className="card-overlay">
               <span>VIEW LOGS</span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </section>

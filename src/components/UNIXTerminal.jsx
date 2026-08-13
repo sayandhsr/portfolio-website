@@ -5,7 +5,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './UNIXTerminal.css';
 
-const SYSTEM_PROMPT = `You are the personal AI agent of Sayandh Raj, an elite AI Engineer & Data Architect. 
+const SYSTEM_PROMPT = `You are the personal AI agent of Sayandh Raj, an elite AI/ML Engineer & Data Architect. 
 You speak in a concise, technical, and slightly robotic terminal style. 
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
 Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
@@ -142,40 +142,100 @@ const UNIXTerminal = () => {
 
     setIsProcessing(true);
     let replyText = '';
+    const userMsgLower = userMsg.toLowerCase();
 
+    // 1. OFFLINE RULE ENGINE (Pre-Filter)
+    if (["hi", "hello", "hey", "yo"].includes(userMsgLower)) {
+      replyText = "SYSTEM OPERATIONAL. I am Sayandh Raj's AI Agent. Type `help`, `whois`, `skills`, `projects`, or `contact`.";
+      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
+      logToFirestore(userMsg, replyText);
+      setIsProcessing(false);
+      return;
+    }
+    if (["whois", "about", "bio"].includes(userMsgLower)) {
+      replyText = "Sayandh Raj is an AI/ML Engineer & Data Architect pursuing an M.Sc. in CS (AI Specialization). BCA in AI & Data Science (CGPA: 8.59).";
+      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
+      logToFirestore(userMsg, replyText);
+      setIsProcessing(false);
+      return;
+    }
+    if (["contact", "phone", "email"].includes(userMsgLower)) {
+      replyText = "Phone: +91 8590679716 | Email: sayandhsr123@gmail.com | LinkedIn: sayandh-raj";
+      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
+      logToFirestore(userMsg, replyText);
+      setIsProcessing(false);
+      return;
+    }
+    if (["skills", "stack"].includes(userMsgLower)) {
+      replyText = "Python, TensorFlow, PyTorch, Scikit-Learn, Pandas, Power BI, FastAPI, LangChain, RAG, Data Modelling, EDA.";
+      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
+      logToFirestore(userMsg, replyText);
+      setIsProcessing(false);
+      return;
+    }
+    if (["projects"].includes(userMsgLower)) {
+      replyText = "ATS Resume Builder, RAG Document Chatbot, AI Code Reviewer, Crop Forecasting, Skin Disease Prediction.";
+      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
+      logToFirestore(userMsg, replyText);
+      setIsProcessing(false);
+      return;
+    }
+
+    // 2. PRIMARY API: OpenRouter (with 4s timeout)
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error("NO_GEMINI_KEY");
-      
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: SYSTEM_PROMPT });
-      
-      const result = await model.generateContent(userMsg);
-      replyText = result.response.text();
-    } catch (err) {
-      console.warn("Gemini Failed, falling back to OpenRouter", err);
-      try {
-        const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-        if (!orKey) throw new Error("NO_OPENROUTER_KEY");
+      const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      if (!orKey) throw new Error("NO_OPENROUTER_KEY");
 
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${orKey}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "google/gemini-pro",
-            messages: [
-              { role: "system", content: SYSTEM_PROMPT },
-              { role: "user", content: userMsg }
-            ]
-          })
+      const fetchPromise = fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${orKey}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Brutalist Portfolio",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "google/gemini-flash-1.5",
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userMsg }
+          ]
+        })
+      });
+
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+      const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+      if (!response.ok) {
+         throw new Error(`OpenRouter HTTP Error: ${response.status}`);
+      }
+      const data = await response.json();
+      replyText = data.choices[0].message.content;
+
+    } catch (orErr) {
+      console.warn("OpenRouter API Failed or Timed Out, falling back to Gemini:", orErr);
+      
+      // 3. FALLBACK API: Gemini 1.5 Flash (with 4s timeout)
+      try {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) throw new Error("NO_GEMINI_KEY");
+        
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ 
+          model: "gemini-1.5-flash", 
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
         });
-        const data = await response.json();
-        replyText = data.choices[0].message.content;
-      } catch (orErr) {
-        replyText = "ERR: API TIMEOUT OR UNAVAILABLE. SYSTEM OPERATING IN OFFLINE MODE.";
+        
+        const geminiPromise = model.generateContent(userMsg);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+        const result = await Promise.race([geminiPromise, timeoutPromise]);
+        
+        replyText = result.response.text();
+      } catch (geminiErr) {
+        console.warn("Gemini API Failed or Timed Out:", geminiErr);
+        
+        // 4. OFFLINE FALLBACK KNOWLEDGE BASE
+        replyText = "CONNECTION TIMEOUT. OFFLINE FALLBACK: Sayandh Raj is an elite AI/ML Engineer & Data Architect. Proficient in Python, GenAI, and robust data pipelines. Please use the contact command to reach out directly.";
       }
     }
 

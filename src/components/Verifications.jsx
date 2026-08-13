@@ -42,9 +42,17 @@ const Verifications = () => {
       <h2 className="section-header dark-bg-header">VERIFICATIONS</h2>
       <ul className="cert-list" ref={listRef}>
         {certifications.map((cert, idx) => (
-          <li key={idx} className="cert-item">
-            <span className="cert-indicator">►</span> {cert}
-          </li>
+          <a 
+            key={idx}
+            href="https://drive.google.com/drive/folders/13HvOqMhvEh0V_z04GpcMPh1rcx5M2W_m?usp=drive_link" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <li className="cert-item">
+              <span className="cert-indicator">►</span> {cert}
+            </li>
+          </a>
         ))}
       </ul>
       <div className="db-access-container">

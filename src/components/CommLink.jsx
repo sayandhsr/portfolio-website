@@ -32,6 +32,10 @@ const CommLink = () => {
       </div>
 
       <div className="comm-grid">
+        <a href="tel:+918590679716" className="comm-item">
+          <span className="comm-label">PHONE / SECURE CALL</span>
+          <span className="comm-value">+91 8590679716</span>
+        </a>
         <a href="https://github.com/sayandhsr" target="_blank" rel="noopener noreferrer" className="comm-item">
           <span className="comm-label">GITHUB</span>
           <span className="comm-value">[{repoCount} REPOSITORIES]</span>
