@@ -1,6 +1,11 @@
 .verifications-section {
   background-color: var(--asphalt-black);
   color: var(--concrete-white);
+  cursor: auto !important;
+}
+
+.verifications-section * {
+  cursor: auto !important;
 }
 
 .cert-list {
