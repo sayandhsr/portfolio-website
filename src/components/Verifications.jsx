@@ -3,11 +3,19 @@ import gsap from 'gsap';
 import './Verifications.css';
 
 const certifications = [
-  "IBM Data Science Professional",
-  "IBM Machine Learning Professional",
-  "AI Engineering Specialization",
-  "Google Advanced Data Analytics",
-  "Microsoft Power BI Data Analyst",
+  "AI Engineering Specialization (Coursera)",
+  "AI Infrastructure & Operations Fundamentals (Coursera)",
+  "Google Advanced Data Analytics (Coursera)",
+  "Google Data Analytics (Coursera)",
+  "IBM Data Science Professional (Coursera)",
+  "IBM Machine Learning Professional (Coursera)",
+  "IBM Introduction to ML (Coursera)",
+  "Microsoft Power BI Data Analyst (Coursera)",
+  "Data Analysis with R (Coursera)",
+  "Data Science Fundamentals with Python & SQL (Coursera)",
+  "Strategic Leadership & Management (Coursera)",
+  "People & Soft Skills (Coursera)",
+  "Data Modelling & Visualization (TCS)",
   "TCS NQT 2026 – Cognitive Score: 70.47%"
 ];
 

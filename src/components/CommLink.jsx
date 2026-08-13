@@ -5,7 +5,6 @@ const CommLink = () => {
   const [repoCount, setRepoCount] = useState('...');
 
   useEffect(() => {
-    // Attempt to fetch public repo count from GitHub
     fetch('https://api.github.com/users/sayandhsr')
       .then(res => res.json())
       .then(data => {
@@ -19,6 +18,19 @@ const CommLink = () => {
   return (
     <footer className="section-container comm-link-section">
       <h2 className="section-header">COMM-LINK</h2>
+      
+      <div className="matcha-container">
+        <a 
+          href="https://buy.stripe.com/test_placeholder" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="brutalist-button matcha-btn"
+        >
+          🍵 BUY ME A MATCHA
+        </a>
+        <span className="matcha-note">OR USE COMMAND `&gt; execute tip_matcha.sh`</span>
+      </div>
+
       <div className="comm-grid">
         <a href="https://github.com/sayandhsr" target="_blank" rel="noopener noreferrer" className="comm-item">
           <span className="comm-label">GITHUB</span>

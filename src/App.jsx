@@ -9,14 +9,12 @@ import TheArsenal from './components/TheArsenal';
 import EngineComponents from './components/EngineComponents';
 import Verifications from './components/Verifications';
 import CommLink from './components/CommLink';
-import AIHelpdesk from './components/AIHelpdesk';
+import UNIXTerminal from './components/UNIXTerminal';
 
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
   useEffect(() => {
-    // Global scroll animations setup can go here, 
-    // but we will keep most inside component-level useEffects for clean architecture.
   }, []);
 
   return (
@@ -28,7 +26,7 @@ function App() {
       <EngineComponents />
       <Verifications />
       <CommLink />
-      <AIHelpdesk />
+      <UNIXTerminal />
     </main>
   );
 }

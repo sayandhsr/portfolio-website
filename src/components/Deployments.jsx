@@ -10,18 +10,23 @@ const deploymentsData = [
   },
   {
     company: "TCS iON",
-    role: "End-to-End Cloud Big Data Solution",
-    details: "Developed Real-Time Logistics Intelligence architecture."
+    role: "Applied Industry Project",
+    details: "End-to-End Cloud Big Data Solution for Real-Time Logistics Intelligence."
   },
   {
     company: "Networkers Home",
-    role: "AI Engineering Intern",
+    role: "AI Engineering Internship",
     details: "Engineered machine learning models for network optimization."
   },
   {
     company: "AISECT Learn",
-    role: "Data Science Core Intern",
+    role: "Python for Data Science Internship",
     details: "Built core data analytics pipelines and statistical models."
+  },
+  {
+    company: "The Developers Arena",
+    role: "Software Development Internship",
+    details: "Developed robust software architecture and integrated scalable backends."
   }
 ];
 
