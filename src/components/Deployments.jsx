@@ -99,7 +99,7 @@ const Deployments = () => {
               rel="noreferrer"
               key={idx} 
               className="deployment-block"
-              style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              style={{ textDecoration: 'none', color: 'var(--asphalt-black)', display: 'block' }}
               ref={el => itemsRef.current[idx] = el}
             >
               {content}
