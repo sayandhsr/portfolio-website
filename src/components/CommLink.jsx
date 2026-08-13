@@ -17,7 +17,7 @@ const CommLink = () => {
 
   return (
     <footer className="section-container comm-link-section">
-      <h2 className="section-header">COMM-LINK</h2>
+      <h2 className="section-header">WORK WITH ME</h2>
       
       <div className="matcha-container">
         <a 
