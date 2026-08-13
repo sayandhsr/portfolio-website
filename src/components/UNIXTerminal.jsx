@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { auth, db, googleProvider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -151,100 +150,158 @@ const UNIXTerminal = () => {
 
     setIsProcessing(true);
     let replyText = '';
-    const userMsgLower = userMsg.toLowerCase();
+    const userMsgLower = userMsg.toLowerCase().trim();
 
-    // 1. OFFLINE RULE ENGINE (Pre-Filter)
-    if (["hi", "hello", "hey", "yo"].includes(userMsgLower)) {
+    // ========== 1. EXPANDED OFFLINE RULE ENGINE (Zero Latency) ==========
+    
+    // Helper: fuzzy keyword match
+    const includes = (keywords) => keywords.some(k => userMsgLower.includes(k));
+
+    // Greetings
+    if (includes(["hi", "hello", "hey", "yo", "sup", "helo", "hii", "hiii", "howdy", "good morning", "good evening", "good night", "gm", "gn"])) {
       replyText = "SYSTEM OPERATIONAL. I am Sayandh Raj's AI Agent. Type `help`, `whois`, `skills`, `projects`, or `contact`.";
-      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
-      logToFirestore(userMsg, replyText);
-      setIsProcessing(false);
-      return;
     }
-    if (["whois", "about", "bio"].includes(userMsgLower)) {
-      replyText = "Sayandh Raj is an AI/ML Engineer & Data Architect pursuing an M.Sc. in CS (AI Specialization). BCA in AI & Data Science (CGPA: 8.59).";
-      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
-      logToFirestore(userMsg, replyText);
-      setIsProcessing(false);
-      return;
+    // Help
+    else if (includes(["help", "commands", "menu", "options", "what can you do"])) {
+      replyText = "AVAILABLE COMMANDS: `whois` | `skills` | `projects` | `contact` | `experience` | `certifications` | `education` | `date` | `time` | `tip` | `toggle_audio` | Or ask me anything.";
     }
-    if (["contact", "phone", "email"].includes(userMsgLower)) {
-      replyText = "Phone: +91 8590679716 | Email: sayandhsr123@gmail.com | LinkedIn: sayandh-raj";
-      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
-      logToFirestore(userMsg, replyText);
-      setIsProcessing(false);
-      return;
+    // Who is / About
+    else if (includes(["whois", "who is", "about", "bio", "tell me about", "who are you", "whose portfolio", "who r u"])) {
+      replyText = "Sayandh Raj is an AI/ML Engineer & Data Architect pursuing an M.Sc. in CS (AI Specialization). BCA in AI & Data Science (CGPA: 8.59). Specializes in Deep Learning, NLP, and end-to-end data pipelines.";
     }
-    if (["skills", "stack"].includes(userMsgLower)) {
-      replyText = "Python, TensorFlow, PyTorch, Scikit-Learn, Pandas, Power BI, FastAPI, LangChain, RAG, Data Modelling, EDA.";
-      setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
-      logToFirestore(userMsg, replyText);
-      setIsProcessing(false);
-      return;
+    // Contact
+    else if (includes(["contact", "phone", "email", "mail", "reach", "call", "number", "linkedin"])) {
+      replyText = "Phone: +91 8590679716 | Email: sayandhsr123@gmail.com | LinkedIn: /in/sayandh-raj | GitHub: /sayandhsr";
     }
-    if (["projects"].includes(userMsgLower)) {
-      replyText = "ATS Resume Builder, RAG Document Chatbot, AI Code Reviewer, Crop Forecasting, Skin Disease Prediction.";
+    // Skills
+    else if (includes(["skill", "stack", "tech", "tools", "what do you know", "languages", "framework"])) {
+      replyText = "Python, TensorFlow, PyTorch, Scikit-Learn, Pandas, NumPy, Power BI, FastAPI, LangChain, Hugging Face, RAG, Docker, Firebase, SQL, R.";
+    }
+    // Projects
+    else if (includes(["project", "work", "portfolio", "built", "made", "created", "arsenal"])) {
+      replyText = "ATS Resume Builder | RAG Document Chatbot | AI Code Reviewer | Crop Forecasting System | Skin Disease Prediction | And more in the Arsenal section above.";
+    }
+    // Experience
+    else if (includes(["experience", "intern", "job", "company", "deployment"])) {
+      replyText = "IBM (Applied AI Programs) | TCS iON (Cloud Big Data) | Networkers Home (AI Engineering) | AISECT Learn (Data Science) | The Developers Arena (Software Dev).";
+    }
+    // Certifications
+    else if (includes(["cert", "certification", "verified", "credential", "course"])) {
+      replyText = "Google Advanced Data Analytics | IBM Data Science Professional | Coursera AI Engineering | TCS iON Industry Project.";
+    }
+    // Education
+    else if (includes(["education", "college", "university", "degree", "study", "school", "bca", "msc"])) {
+      replyText = "M.Sc. Computer Science (AI Specialization) — In Progress | BCA in AI & Data Science — CGPA: 8.59.";
+    }
+    // Date / Time / Day / Month
+    else if (includes(["date", "time", "day", "month", "year", "today", "now", "clock", "what time", "what day"])) {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+      replyText = `SYSTEM CLOCK: ${now.toLocaleDateString('en-IN', options)} | ${now.toLocaleTimeString('en-IN')}`;
+    }
+    // How are you / feelings
+    else if (includes(["how are you", "how r u", "how are u", "how u doing", "wassup", "whats up", "what's up"])) {
+      replyText = "All systems nominal. CPU at optimal. Ready to serve intelligence. How can I assist you?";
+    }
+    // Thank you
+    else if (includes(["thank", "thanks", "thx", "thnx", "thnks", "appreciate"])) {
+      replyText = "Acknowledged. Glad to be of service. Type another command or query anytime.";
+    }
+    // Bye
+    else if (includes(["bye", "exit", "quit", "close", "goodbye", "see you", "later"])) {
+      replyText = "SESSION CLOSING. Until next deployment, human. Type any key to reinitiate.";
+    }
+    // Who made this
+    else if (includes(["who made", "who built", "who created", "developer", "who designed"])) {
+      replyText = "This brutalist architecture was engineered by Sayandh Raj — AI/ML Engineer & Data Architect. Every pixel is intentional.";
+    }
+
+    // If offline rule matched, return immediately
+    if (replyText) {
       setMessages(prev => [...prev, { sender: 'ai', text: replyText, typing: true }]);
       logToFirestore(userMsg, replyText);
       setIsProcessing(false);
       return;
     }
 
-    // 2. PRIMARY API: OpenRouter (with 4s timeout)
+    // ========== 2. PRIMARY API: Gemini Direct (with 12s timeout) ==========
     try {
-      const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      if (!orKey) throw new Error("NO_OPENROUTER_KEY");
-
-      const fetchPromise = fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${orKey}`,
-          "HTTP-Referer": window.location.origin,
-          "X-Title": "Brutalist Portfolio",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "google/gemini-1.5-flash",
-          messages: [
-            { role: "system", content: getSystemPrompt() },
-            { role: "user", content: userMsg }
-          ]
-        })
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error("NO_GEMINI_KEY");
+      
+      const geminiBody = JSON.stringify({
+        system_instruction: { parts: [{ text: getSystemPrompt() }] },
+        contents: [{ parts: [{ text: userMsg }] }],
+        generationConfig: { maxOutputTokens: 300 }
       });
 
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+      const fetchPromise = fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: geminiBody }
+      );
+
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 12000));
       const response = await Promise.race([fetchPromise, timeoutPromise]);
 
-      if (!response.ok) {
-         throw new Error(`OpenRouter HTTP Error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
       const data = await response.json();
-      replyText = data.choices[0].message.content;
+      replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!replyText) throw new Error("Empty Gemini response");
 
-    } catch (orErr) {
-      console.warn("OpenRouter API Failed or Timed Out, falling back to Gemini:", orErr);
+    } catch (geminiErr) {
+      console.warn("Gemini Direct failed, falling back to OpenRouter:", geminiErr);
       
-      // 3. FALLBACK API: Gemini 1.5 Flash (with 4s timeout)
+      // ========== 3. FALLBACK API: OpenRouter (with 12s timeout) ==========
       try {
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-        if (!apiKey) throw new Error("NO_GEMINI_KEY");
-        
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ 
-          model: "gemini-1.5-flash", 
-          systemInstruction: { parts: [{ text: getSystemPrompt() }] }
+        const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+        if (!orKey) throw new Error("NO_OPENROUTER_KEY");
+
+        const fetchPromise = fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${orKey}`,
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "Brutalist Portfolio",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            max_tokens: 300,
+            messages: [
+              { role: "system", content: getSystemPrompt() },
+              { role: "user", content: userMsg }
+            ]
+          })
         });
-        
-        const geminiPromise = model.generateContent(userMsg);
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
-        const result = await Promise.race([geminiPromise, timeoutPromise]);
-        
-        replyText = result.response.text();
-      } catch (geminiErr) {
-        console.warn("Gemini API Failed or Timed Out:", geminiErr);
-        
-        // 4. OFFLINE FALLBACK KNOWLEDGE BASE
-        replyText = "CONNECTION TIMEOUT. OFFLINE FALLBACK: Sayandh Raj is an elite AI/ML Engineer & Data Architect. Proficient in Python, GenAI, and robust data pipelines. Please use the contact command to reach out directly.";
+
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 12000));
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (!response.ok) throw new Error(`OpenRouter HTTP ${response.status}`);
+        const data = await response.json();
+        replyText = data.choices?.[0]?.message?.content || '';
+        if (!replyText) throw new Error("Empty OpenRouter response");
+
+      } catch (orErr) {
+        console.warn("OpenRouter fallback also failed:", orErr);
+
+        // ========== 4. SMART OFFLINE FALLBACK ==========
+        // Detect gibberish: if more than 60% of chars are consonants with no vowels pattern
+        const vowelCount = (userMsgLower.match(/[aeiou]/g) || []).length;
+        const letterCount = (userMsgLower.match(/[a-z]/g) || []).length;
+        const vowelRatio = letterCount > 0 ? vowelCount / letterCount : 0;
+
+        if (letterCount > 2 && vowelRatio < 0.15) {
+          const jokes = [
+            "LOL. ERROR 418: Your keyboard appears to be having a seizure. Try using actual words next time, human.",
+            "LOL. PARSING FAILED. Did your cat walk across the keyboard? I need real words to process.",
+            "LOL. SYNTAX ERROR: That input violated every known language protocol. Try again with human-readable text.",
+            "LOL. CRITICAL FAILURE: Brain.exe not found in your input. Rebooting expectations...",
+          ];
+          replyText = jokes[Math.floor(Math.random() * jokes.length)];
+        } else {
+          replyText = "BOTH APIs OFFLINE. Sayandh Raj is an elite AI/ML Engineer & Data Architect. Proficient in Python, GenAI, Deep Learning, and robust data pipelines. Type `contact` to reach out directly or `help` for available commands.";
+        }
       }
     }
 
