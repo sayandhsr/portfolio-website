@@ -66,3 +66,5 @@ This application is configured for edge deployment on **Vercel**.
 The repository includes a `vercel.json` configuration file enforcing strict Single Page Application (SPA) routing protocols to `/index.html`. All environment variables must be securely injected via the Vercel project dashboard prior to deployment. 
 
 > **SYSTEM ARCHITECT: SAYANDH RAJ**
+
+https://portfolio-website-37jv.vercel.app/. use this link to visit the portfolio website 
