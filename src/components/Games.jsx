@@ -16,7 +16,10 @@ const gameContainerStyle = {
 };
 
 const playBeep = (ctx, type = 'eat') => {
-  if (!ctx || ctx.state !== 'running') return;
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
   try {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
