@@ -67,15 +67,19 @@ export const SnakeGame = ({ onExit }) => {
       }
       switch (e.key) {
         case 'ArrowUp':
+          e.preventDefault();
           if (velocity.current.y !== 1) nextVelocity.current = { x: 0, y: -1 };
           break;
         case 'ArrowDown':
+          e.preventDefault();
           if (velocity.current.y !== -1) nextVelocity.current = { x: 0, y: 1 };
           break;
         case 'ArrowLeft':
+          e.preventDefault();
           if (velocity.current.x !== 1) nextVelocity.current = { x: -1, y: 0 };
           break;
         case 'ArrowRight':
+          e.preventDefault();
           if (velocity.current.x !== -1) nextVelocity.current = { x: 1, y: 0 };
           break;
       }
@@ -238,6 +242,9 @@ export const BreakoutGame = ({ onExit }) => {
     const handleKeyDown = (e) => {
       if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
         audioCtxRef.current.resume();
+      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
       }
       if (e.key === 'ArrowRight') rightPressed.current = true;
       if (e.key === 'ArrowLeft') leftPressed.current = true;

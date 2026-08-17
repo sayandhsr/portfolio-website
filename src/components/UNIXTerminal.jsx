@@ -73,7 +73,7 @@ const UNIXTerminal = () => {
 
   const [messages, setMessages] = useState([
     { sender: 'system', text: 'INIT SYSTEM...', typing: false },
-    { sender: 'system', text: 'AWAITING COMMAND.', typing: false }
+    { sender: 'system', text: "AWAITING COMMAND. Type 'help' for options or 'game' to play.", typing: false }
   ]);
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -137,6 +137,13 @@ const UNIXTerminal = () => {
       setTimeout(() => {
         window.open('upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR', '_blank');
       }, 1500);
+      return;
+    }
+
+    if (userMsgLower === 'clear' || userMsgLower === '> clear') {
+      setMessages([]);
+      setInput('');
+      setIsProcessing(false);
       return;
     }
 
