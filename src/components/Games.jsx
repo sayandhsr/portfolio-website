@@ -305,11 +305,11 @@ export const BreakoutGame = ({ onExit }) => {
       if (e.key === 'ArrowLeft') leftPressed.current = false;
     };
 
-    const handleTouchMove = (e) => {
+    const handleTouch = (e) => {
       e.preventDefault(); // Prevent scrolling
       if (!canvasRef.current) return;
       if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume();
+        audioCtxRef.current.resume().catch(() => {});
       }
       const rect = canvasRef.current.getBoundingClientRect();
       const touchX = e.touches[0].clientX - rect.left;
@@ -326,14 +326,16 @@ export const BreakoutGame = ({ onExit }) => {
     window.addEventListener('keyup', handleKeyUp);
     
     if (canvasRef.current) {
-      canvasRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvasRef.current.addEventListener('touchstart', handleTouch, { passive: false });
+      canvasRef.current.addEventListener('touchmove', handleTouch, { passive: false });
     }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       if (canvasRef.current) {
-        canvasRef.current.removeEventListener('touchmove', handleTouchMove);
+        canvasRef.current.removeEventListener('touchstart', handleTouch);
+        canvasRef.current.removeEventListener('touchmove', handleTouch);
       }
       if (gameLoop.current) cancelAnimationFrame(gameLoop.current);
       if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {});
@@ -450,8 +452,15 @@ export const BreakoutGame = ({ onExit }) => {
         EXIT
       </button>
       
-      { (gameOver || won) ? (
-        <div style={{ textAlign: 'center' }}>
+      <canvas 
+        ref={canvasRef} 
+        width={300} 
+        height={300} 
+        style={{ border: '2px solid #2a3b22', marginTop: 30, display: (gameOver || won) ? 'none' : 'block' }}
+      />
+
+      { (gameOver || won) && (
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
           <h2 style={{ color: '#2a3b22' }}>{won ? 'YOU WIN!' : 'GAME OVER'}</h2>
           <p style={{ color: '#2a3b22', marginBottom: 20 }}>SCORE: {score}</p>
           <button 
@@ -476,13 +485,6 @@ export const BreakoutGame = ({ onExit }) => {
             RETRY
           </button>
         </div>
-      ) : (
-        <canvas 
-          ref={canvasRef} 
-          width={300} 
-          height={300} 
-          style={{ border: '2px solid #2a3b22', marginTop: 30 }}
-        />
       )}
     </div>
   );
