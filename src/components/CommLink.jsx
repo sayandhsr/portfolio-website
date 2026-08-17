@@ -56,6 +56,10 @@ const CommLink = () => {
           <span className="comm-label">THREADS</span>
           <span className="comm-value">@sayahd_</span>
         </a>
+        <a href="https://www.instagram.com/sayahd_" target="_blank" rel="noopener noreferrer" className="comm-item">
+          <span className="comm-label">INSTAGRAM</span>
+          <span className="comm-value">@sayahd_</span>
+        </a>
         <a href="mailto:sayandhsr123@gmail.com" className="comm-item">
           <span className="comm-label">EMAIL</span>
           <span className="comm-value">sayandhsr123@gmail.com</span>

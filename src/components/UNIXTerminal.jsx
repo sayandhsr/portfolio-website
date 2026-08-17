@@ -170,8 +170,8 @@ const UNIXTerminal = () => {
       replyText = "Sayandh Raj is an AI/ML Engineer & Data Architect pursuing an M.Sc. in CS (AI Specialization). BCA in AI & Data Science (CGPA: 8.59). Specializes in Deep Learning, NLP, and end-to-end data pipelines.";
     }
     // Contact
-    else if (includes(["contact", "phone", "email", "mail", "reach", "call", "number", "linkedin"])) {
-      replyText = "Phone: +91 8590679716 | Email: sayandhsr123@gmail.com | LinkedIn: /in/sayandh-raj | GitHub: /sayandhsr";
+    else if (includes(["contact", "phone", "email", "mail", "reach", "call", "number", "linkedin", "instagram"])) {
+      replyText = "Phone: +91 8590679716 | Email: sayandhsr123@gmail.com | LinkedIn: /in/sayandh-raj | GitHub: /sayandhsr | Instagram: @sayahd_";
     }
     // Skills
     else if (includes(["skill", "stack", "tech", "tools", "what do you know", "languages", "framework"])) {
