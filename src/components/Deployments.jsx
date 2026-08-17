@@ -4,6 +4,12 @@ import './Deployments.css';
 
 const deploymentsData = [
   {
+    company: "Networkers Home",
+    role: "AI Engineering Internship",
+    details: "Engineered machine learning models for network optimization.",
+    url: "https://drive.google.com/file/d/14CDnqWtqvgZdBRMsQfnHxQSejRQ_rW3H/view?usp=drive_link"
+  },
+  {
     company: "IBM",
     role: "Industry Projects and Applied AI Programs",
     details: "Executed advanced AI programs focusing on industrial solutions."
@@ -13,12 +19,6 @@ const deploymentsData = [
     role: "Applied Industry Project",
     details: "End-to-End Cloud Big Data Solution for Real-Time Logistics Intelligence.",
     url: "https://drive.google.com/file/d/1PaUBkPkdkWM6r0UbMbtRwC3ANRpt4TKP/view?usp=drive_link"
-  },
-  {
-    company: "Networkers Home",
-    role: "AI Engineering Internship",
-    details: "Engineered machine learning models for network optimization.",
-    url: "https://drive.google.com/file/d/14CDnqWtqvgZdBRMsQfnHxQSejRQ_rW3H/view?usp=drive_link"
   },
   {
     company: "AISECT Learn",

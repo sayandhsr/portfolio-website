@@ -23,6 +23,8 @@ body {
   font-family: var(--font-body);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 ::selection {
@@ -70,15 +72,5 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Scrollbar customization */
 ::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-track {
-  background: var(--asphalt-black);
-  border-left: 1px solid #333;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--concrete-white);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--industrial-cream);
+  display: none;
 }
