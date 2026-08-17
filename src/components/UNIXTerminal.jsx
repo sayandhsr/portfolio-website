@@ -236,7 +236,7 @@ const UNIXTerminal = () => {
       });
 
       const fetchPromise = fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
         { method: "POST", headers: { "Content-Type": "application/json" }, body: geminiBody }
       );
 
@@ -265,7 +265,7 @@ const UNIXTerminal = () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "google/gemini-1.5-flash",
+            model: "google/gemini-2.5-flash-lite",
             max_tokens: 1000,
             messages: [
               { role: "system", content: getSystemPrompt() },
