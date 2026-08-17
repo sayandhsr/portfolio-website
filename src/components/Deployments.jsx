@@ -28,8 +28,8 @@ const deploymentsData = [
   },
   {
     company: "The Developers Arena",
-    role: "Software Development Internship",
-    details: "Developed robust software architecture and integrated scalable backends.",
+    role: "Data Science and Analytics Internship",
+    details: "Developed robust data architecture and integrated scalable analytical models.",
     url: "https://drive.google.com/file/d/1tIRGmHjQig1_3QKwpW9yxTmygaZBNiWH/view?usp=drive_link"
   }
 ];
