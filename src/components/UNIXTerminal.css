@@ -8,22 +8,22 @@
 
 .terminal-toggle {
   background: var(--asphalt-black);
-  color: #0f0;
-  border: 4px solid #0f0;
-  padding: 1rem 2rem;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 0.5rem 1rem;
   font-family: var(--font-mono);
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 6px 6px 0px rgba(0, 255, 0, 0.2);
+  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.2);
   transition: all 0.2s;
 }
 
 .terminal-toggle:hover {
-  background: #0f0;
+  background: #fff;
   color: var(--asphalt-black);
   transform: translate(-4px, -4px);
-  box-shadow: 10px 10px 0px rgba(0, 255, 0, 0.4);
+  box-shadow: 6px 6px 0px rgba(255, 255, 255, 0.4);
 }
 
 .terminal-window {
@@ -73,7 +73,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  color: #0f0;
+  color: #fff;
   font-size: 1rem;
 }
 
@@ -90,7 +90,7 @@
 
 .t-prompt {
   white-space: nowrap;
-  color: #0f0;
+  color: #fff;
   opacity: 0.8;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .cursor-blink {
-  color: #0f0;
+  color: #fff;
   animation: blink 1s step-end infinite;
 }
 

@@ -10,7 +10,7 @@ const getSystemPrompt = () => {
 You speak in a concise, technical, and slightly robotic terminal style. 
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
 Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
-Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena.
+Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena (Data Science and Analytics).
 
 CRITICAL INSTRUCTIONS:
 1. You can answer general knowledge questions, conversational chats, and basic queries.
@@ -183,7 +183,7 @@ const UNIXTerminal = () => {
     }
     // Experience
     else if (includes(["experience", "intern", "job", "company", "deployment"])) {
-      replyText = "IBM (Applied AI Programs) | TCS iON (Cloud Big Data) | Networkers Home (AI Engineering) | AISECT Learn (Data Science) | The Developers Arena (Software Dev).";
+      replyText = "IBM (Applied AI Programs) | TCS iON (Cloud Big Data) | Networkers Home (AI Engineering) | AISECT Learn (Data Science) | The Developers Arena (Data Science and Analytics).";
     }
     // Certifications
     else if (includes(["cert", "certification", "verified", "credential", "course"])) {
@@ -232,11 +232,11 @@ const UNIXTerminal = () => {
       const geminiBody = JSON.stringify({
         system_instruction: { parts: [{ text: getSystemPrompt() }] },
         contents: [{ parts: [{ text: userMsg }] }],
-        generationConfig: { maxOutputTokens: 300 }
+        generationConfig: { maxOutputTokens: 1000 }
       });
 
       const fetchPromise = fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         { method: "POST", headers: { "Content-Type": "application/json" }, body: geminiBody }
       );
 
@@ -265,8 +265,8 @@ const UNIXTerminal = () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash-lite",
-            max_tokens: 300,
+            model: "google/gemini-1.5-flash",
+            max_tokens: 1000,
             messages: [
               { role: "system", content: getSystemPrompt() },
               { role: "user", content: userMsg }

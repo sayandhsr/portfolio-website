@@ -57,7 +57,7 @@ const CommLink = () => {
           <span className="comm-value">@sayahd_</span>
         </a>
         <a href="mailto:sayandhsr123@gmail.com" className="comm-item">
-          <span className="comm-label">SECURE COMM</span>
+          <span className="comm-label">EMAIL</span>
           <span className="comm-value">sayandhsr123@gmail.com</span>
         </a>
       </div>
