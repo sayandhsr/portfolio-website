@@ -330,7 +330,19 @@ const UNIXTerminal = () => {
         <div className="terminal-window">
           <div className="terminal-header">
             <span>root@sayandh-node:~</span>
-            <span>[AUDIO: {audioEnabled ? 'ON' : 'OFF'}]</span>
+            <span 
+              onClick={(e) => {
+                e.stopPropagation();
+                const newState = !audioEnabled;
+                setAudioEnabled(newState);
+                if (newState && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+                  audioCtxRef.current.resume();
+                }
+              }}
+              style={{cursor: 'pointer'}}
+            >
+              [AUDIO: {audioEnabled ? 'ON' : 'OFF'}]
+            </span>
             <button className="terminal-close" onClick={toggleTerminal}>[X]</button>
           </div>
           
