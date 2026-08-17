@@ -141,7 +141,10 @@ const UNIXTerminal = () => {
     }
 
     if (userMsg.toLowerCase() === 'clear' || userMsg.toLowerCase() === '> clear') {
-      setMessages([]);
+      setMessages([
+        { sender: 'system', text: 'INIT SYSTEM...', typing: false },
+        { sender: 'system', text: "AWAITING COMMAND. Type 'help' for options or 'game' to play.", typing: false }
+      ]);
       setInput('');
       setIsProcessing(false);
       return;
