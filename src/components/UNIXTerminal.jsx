@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { auth, db, googleProvider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { SnakeGame, BreakoutGame } from './Games';
 import './UNIXTerminal.css';
 
 const getSystemPrompt = () => {
@@ -29,18 +30,18 @@ const TypewriterText = ({ text, onComplete, audioEnabled, audioCtxRef }) => {
     try {
       const osc = audioCtxRef.current.createOscillator();
       const gain = audioCtxRef.current.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(800, audioCtxRef.current.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(400, audioCtxRef.current.currentTime + 0.05);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, audioCtxRef.current.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, audioCtxRef.current.currentTime + 0.02);
       
-      gain.gain.setValueAtTime(0.05, audioCtxRef.current.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtxRef.current.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.01, audioCtxRef.current.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtxRef.current.currentTime + 0.02);
       
       osc.connect(gain);
       gain.connect(audioCtxRef.current.destination);
       
       osc.start();
-      osc.stop(audioCtxRef.current.currentTime + 0.05);
+      osc.stop(audioCtxRef.current.currentTime + 0.02);
     } catch (e) {
       // Ignore audio errors if context is suspended
     }
@@ -52,7 +53,7 @@ const TypewriterText = ({ text, onComplete, audioEnabled, audioCtxRef }) => {
     const timer = setInterval(() => {
       if (index.current < text.length) {
         setDisplayed(prev => prev + text.charAt(index.current));
-        playTick();
+        if (index.current % 3 === 0) playTick();
         index.current++;
       } else {
         clearInterval(timer);
@@ -77,6 +78,7 @@ const UNIXTerminal = () => {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const endOfMessagesRef = useRef(null);
+  const [activeGame, setActiveGame] = useState(null);
 
   useEffect(() => {
     // Initialize Audio Context on first interaction
@@ -163,7 +165,7 @@ const UNIXTerminal = () => {
     }
     // Help
     else if (includes(["help", "commands", "menu", "options", "what can you do"])) {
-      replyText = "AVAILABLE COMMANDS: `whois` | `skills` | `projects` | `contact` | `experience` | `certifications` | `education` | `date` | `time` | `tip` | `toggle_audio` | Or ask me anything.";
+      replyText = "AVAILABLE COMMANDS: `whois` | `skills` | `projects` | `contact` | `experience` | `certifications` | `education` | `date` | `time` | `tip` | `game` | `toggle_audio` | Or ask me anything.";
     }
     // Who is / About
     else if (includes(["whois", "who is", "about", "bio", "tell me about", "who are you", "whose portfolio", "who r u"])) {
@@ -214,6 +216,16 @@ const UNIXTerminal = () => {
     // Who made this
     else if (includes(["who made", "who built", "who created", "developer", "who designed"])) {
       replyText = "This brutalist architecture was engineered by Sayandh Raj — AI/ML Engineer & Data Architect. Every pixel is intentional.";
+    }
+    // Games
+    else if (userMsgLower === 'game' || userMsgLower === '> game') {
+      replyText = "AVAILABLE MODULES: `snake` | `bubble`. Initialize module by typing its name.";
+    } else if (userMsgLower === 'snake' || userMsgLower === '> snake') {
+      setActiveGame('snake');
+      replyText = "INITIALIZING SNAKE PROTOCOL...";
+    } else if (userMsgLower === 'bubble' || userMsgLower === '> bubble') {
+      setActiveGame('bubble');
+      replyText = "INITIALIZING BUBBLE PROTOCOL...";
     }
 
     // If offline rule matched, return immediately
@@ -346,8 +358,11 @@ const UNIXTerminal = () => {
             <button className="terminal-close" onClick={toggleTerminal}>[X]</button>
           </div>
           
-          <div className="terminal-body">
-            {messages.map((msg, idx) => (
+          <div className="terminal-body" style={activeGame ? { padding: 0 } : {}}>
+            {activeGame === 'snake' && <SnakeGame onExit={() => setActiveGame(null)} />}
+            {activeGame === 'bubble' && <BreakoutGame onExit={() => setActiveGame(null)} />}
+            
+            {!activeGame && messages.map((msg, idx) => (
               <div key={idx} className={`t-line ${msg.sender}`}>
                 <span className="t-prompt">
                   {msg.sender === 'user' ? (auth.currentUser ? `${auth.currentUser.displayName.split(' ')[0].toLowerCase()}@sys:~$` : 'guest@sys:~$') : 'root@ai:~$'}
@@ -366,21 +381,23 @@ const UNIXTerminal = () => {
                 </span>
               </div>
             ))}
-            <div ref={endOfMessagesRef} />
+            {!activeGame && <div ref={endOfMessagesRef} />}
           </div>
 
-          <form className="terminal-input-form" onSubmit={handleSend}>
-            <span className="t-prompt">{auth.currentUser ? `${auth.currentUser.displayName.split(' ')[0].toLowerCase()}@sys:~$` : 'guest@sys:~$'}</span>
-            <input 
-              type="text" 
-              className="terminal-input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isProcessing}
-              autoFocus
-            />
-            <span className="cursor-blink">_</span>
-          </form>
+          {!activeGame && (
+            <form className="terminal-input-form" onSubmit={handleSend}>
+              <span className="t-prompt">{auth.currentUser ? `${auth.currentUser.displayName.split(' ')[0].toLowerCase()}@sys:~$` : 'guest@sys:~$'}</span>
+              <input 
+                type="text" 
+                className="terminal-input"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={isProcessing}
+                autoFocus
+              />
+              <span className="cursor-blink">_</span>
+            </form>
+          )}
         </div>
       )}
     </div>
