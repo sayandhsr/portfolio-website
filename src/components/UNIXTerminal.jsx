@@ -140,7 +140,7 @@ const UNIXTerminal = () => {
       return;
     }
 
-    if (userMsgLower === 'clear' || userMsgLower === '> clear') {
+    if (userMsg.toLowerCase() === 'clear' || userMsg.toLowerCase() === '> clear') {
       setMessages([]);
       setInput('');
       setIsProcessing(false);
