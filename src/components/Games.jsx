@@ -84,9 +84,57 @@ export const SnakeGame = ({ onExit }) => {
           break;
       }
     };
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const handleTouchStart = (e) => {
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e) => {
+      if (!touchStartX || !touchStartY) return;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+      
+      // Minimum swipe distance
+      if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0 && velocity.current.x !== -1) nextVelocity.current = { x: 1, y: 0 };
+        else if (dx < 0 && velocity.current.x !== 1) nextVelocity.current = { x: -1, y: 0 };
+      } else {
+        if (dy > 0 && velocity.current.y !== -1) nextVelocity.current = { x: 0, y: 1 };
+        else if (dy < 0 && velocity.current.y !== 1) nextVelocity.current = { x: 0, y: -1 };
+      }
+      touchStartX = 0;
+      touchStartY = 0;
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault(); // Prevent scrolling while playing
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+      canvasRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvasRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+    }
+    
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('touchstart', handleTouchStart);
+        canvasRef.current.removeEventListener('touchmove', handleTouchMove);
+        canvasRef.current.removeEventListener('touchend', handleTouchEnd);
+      }
       if (gameLoop.current) clearInterval(gameLoop.current);
       if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {});
     };
@@ -253,11 +301,37 @@ export const BreakoutGame = ({ onExit }) => {
       if (e.key === 'ArrowRight') rightPressed.current = false;
       if (e.key === 'ArrowLeft') leftPressed.current = false;
     };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault(); // Prevent scrolling
+      if (!canvasRef.current) return;
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      const rect = canvasRef.current.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      
+      // Center paddle on touch
+      let newX = touchX - paddleWidth / 2;
+      if (newX < 0) newX = 0;
+      if (newX > canvasRef.current.width - paddleWidth) newX = canvasRef.current.width - paddleWidth;
+      
+      paddleX.current = newX;
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+    }
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('touchmove', handleTouchMove);
+      }
       if (gameLoop.current) cancelAnimationFrame(gameLoop.current);
       if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {});
     };
