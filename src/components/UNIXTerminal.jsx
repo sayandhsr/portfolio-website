@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { auth, db, googleProvider } from '../firebaseConfig';
-import { signInWithPopup } from 'firebase/auth';
+import { db } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { SnakeGame, BreakoutGame } from './Games';
 import './UNIXTerminal.css';
@@ -12,6 +11,7 @@ You speak in a concise, technical, and slightly robotic terminal style.
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
 Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
 Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena (Data Science and Analytics).
+Notable Projects: KILL SWITCH (Smoking Community Platform), Unsullied Code (Offline-First Mobile IDE), ATS Resume Builder, RAG Document Chatbot.
 
 CRITICAL INSTRUCTIONS:
 1. You can answer general knowledge questions, conversational chats, and basic queries.
@@ -105,7 +105,7 @@ const UNIXTerminal = () => {
       await addDoc(collection(db, "terminal_logs"), {
         userQuery: userMsg,
         aiResponse: aiResp,
-        uid: auth.currentUser ? auth.currentUser.uid : 'guest',
+        uid: 'guest',
         timestamp: serverTimestamp()
       });
     } catch (e) {
@@ -122,16 +122,6 @@ const UNIXTerminal = () => {
     setInput('');
 
     // Hardcoded Commands
-    if (userMsg.toLowerCase() === '> login') {
-      try {
-        await signInWithPopup(auth, googleProvider);
-        setMessages(prev => [...prev, { sender: 'system', text: `AUTH SUCCESS: ${auth.currentUser.email}`, typing: true }]);
-      } catch (err) {
-        setMessages(prev => [...prev, { sender: 'system', text: `AUTH FAILED.`, typing: true }]);
-      }
-      return;
-    }
-    
     if (userMsg.toLowerCase() === '> execute tip_matcha.sh' || ["tip", "donate", "matcha"].includes(userMsg.toLowerCase().replace('>', '').trim())) {
       setMessages(prev => [...prev, { sender: 'system', text: `ROUTE SECURE PAYMENT TO UPI ID: sayandhsr123-2@okicici`, typing: true }]);
       setTimeout(() => {
@@ -191,7 +181,14 @@ const UNIXTerminal = () => {
     }
     // Projects
     else if (includes(["project", "work", "portfolio", "built", "made", "created", "arsenal"])) {
-      replyText = "ATS Resume Builder | RAG Document Chatbot | AI Code Reviewer | Crop Forecasting System | Skin Disease Prediction | And more in the Arsenal section above.";
+      replyText = "KILL SWITCH | Unsullied Code | ATS Resume Builder | RAG Document Chatbot | AI Code Reviewer | Crop Forecasting System | And more in the Arsenal section above.";
+    }
+    // Specific Projects
+    else if (includes(["kill switch", "notkillwitch", "smoking community"])) {
+      replyText = "KILL SWITCH: The ultimate smoking community platform. Connect with others who appreciate the culture. Open debates, anonymous spots, real talk. Enter the smoke at notkillwitch.vercel.app";
+    }
+    else if (includes(["unsullied", "unsullied code", "unsulliedcode", "ide"])) {
+      replyText = "Unsullied Code: A New Standard of Mobile Coding. An offline-first IDE featuring a true AST engine, code review arena, and pseudo 3D motion layer. Available at unsulliedcode.vercel.app";
     }
     // Experience
     else if (includes(["experience", "intern", "job", "company", "deployment"])) {
@@ -375,7 +372,7 @@ const UNIXTerminal = () => {
             {!activeGame && messages.map((msg, idx) => (
               <div key={idx} className={`t-line ${msg.sender}`}>
                 <span className="t-prompt">
-                  {msg.sender === 'user' ? (auth.currentUser ? `${auth.currentUser.displayName.split(' ')[0].toLowerCase()}@sys:~$` : 'guest@sys:~$') : 'root@ai:~$'}
+                  {msg.sender === 'user' ? 'guest@sys:~$' : 'root@ai:~$'}
                 </span>
                 <span className="t-text">
                   {msg.typing ? (
@@ -396,7 +393,7 @@ const UNIXTerminal = () => {
 
           {!activeGame && (
             <form className="terminal-input-form" onSubmit={handleSend}>
-              <span className="t-prompt">{auth.currentUser ? `${auth.currentUser.displayName.split(' ')[0].toLowerCase()}@sys:~$` : 'guest@sys:~$'}</span>
+              <span className="t-prompt">guest@sys:~$</span>
               <input 
                 type="text" 
                 className="terminal-input"

@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import './TheArsenal.css';
 
 const projects = [
+  { title: "KILL SWITCH - The Ultimate Smoking Community", url: "https://notkillwitch.vercel.app/" },
+  { title: "Unsullied Code - Offline-First Mobile IDE", url: "https://unsulliedcode.vercel.app/" },
   { title: "ATS Resume Analyzer & AI Resume Builder", url: "https://github.com/sayandhsr" },
   { title: "RAG-Based Document Chatbot with PDF Upload Support", url: "https://github.com/sayandhsr" },
   { title: "AI Code Review Assistant & GitHub Repository Analyzer", url: "https://github.com/sayandhsr" },
