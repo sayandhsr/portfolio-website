@@ -4,21 +4,12 @@
   padding-bottom: 6rem;
 }
 
-.education-subheading {
-  font-family: var(--font-mono);
-  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
-  color: #a1a1aa;
-  letter-spacing: 0.15em;
-  margin-top: -1.5rem;
-  margin-bottom: 3.5rem;
-  text-transform: uppercase;
-}
-
 .education-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 3rem;
+  gap: 2.5rem;
   width: 100%;
+  margin-top: 2rem;
 }
 
 .education-card {
@@ -28,84 +19,59 @@
   padding: 2.2rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .education-card:hover {
-  transform: translate(-6px, -6px);
-  box-shadow: 14px 14px 0px var(--concrete-white);
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0px var(--concrete-white);
   border-color: #3f3f46;
 }
 
+/* Clean Top Metadata Bar */
 .edu-card-topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 1.8rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px dashed #27272a;
-  flex-wrap: wrap;
   gap: 0.75rem;
-}
-
-.edu-id {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: #71717a;
-  letter-spacing: 0.1em;
-}
-
-.edu-meta-tags {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 
 .edu-status-badge {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.25rem 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
   font-weight: 600;
-}
-
-.badge-gold {
-  color: #facc15;
-  background: rgba(250, 204, 21, 0.08);
-  border: 1px solid rgba(250, 204, 21, 0.35);
-}
-
-.badge-green {
   color: #22c55e;
-  background: rgba(34, 197, 94, 0.08);
+  background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.35);
+  padding: 0.3rem 0.65rem;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .edu-period-badge {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--concrete-white);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #e4e4e7;
   background: #18181b;
   border: 1px solid #3f3f46;
-  padding: 0.25rem 0.6rem;
-  letter-spacing: 0.05em;
+  padding: 0.3rem 0.65rem;
+  border-radius: 2px;
 }
 
-/* Pristine Logo Showcase Wrapper */
+/* University Logo Container */
 .edu-logo-wrapper {
   background: #ffffff;
   border: 1px solid #e4e4e7;
   border-radius: 2px;
-  height: 95px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.8rem;
 }
 
 .edu-logo-img {
@@ -115,141 +81,96 @@
   display: block;
 }
 
-.edu-card-body {
-  flex-grow: 1;
+/* Degree & Major - Clear, Uncompressed Typography */
+.edu-title-group {
+  margin-bottom: 1.25rem;
 }
 
 .edu-degree-title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 3.2vw, 2.75rem);
-  letter-spacing: 0.03em;
-  color: var(--concrete-white);
-  margin-bottom: 0.4rem;
-  line-height: 1.05;
+  font-family: var(--font-body);
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+  text-transform: none;
 }
 
-.edu-field-name {
+.edu-major-name {
   font-family: var(--font-mono);
-  font-size: 0.98rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #22c55e;
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.04em;
-  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
+/* Institution Details */
 .edu-institution-info {
-  margin-bottom: 1.8rem;
-  padding-left: 0.9rem;
-  border-left: 3px solid #facc15;
+  margin-bottom: 1.4rem;
+  padding-left: 0.85rem;
+  border-left: 3px solid #15803d;
 }
 
 .edu-inst-main {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--concrete-white);
-  line-height: 1.35;
-  margin-bottom: 0.35rem;
-}
-
-.edu-inst-alias {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  color: #d4d4d8;
+  color: #f4f4f5;
+  line-height: 1.4;
   margin-bottom: 0.25rem;
 }
 
-.edu-historical-note {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  font-style: italic;
-  line-height: 1.3;
-}
-
-.edu-highlights {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  margin-top: 1.2rem;
-  margin-bottom: 1.8rem;
-}
-
-.edu-highlight-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.45;
+.edu-inst-sub {
+  font-size: 0.88rem;
   color: #d4d4d8;
+  margin-bottom: 0.2rem;
 }
 
-.edu-bullet {
-  color: #22c55e;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.edu-detail-text {
-  flex-grow: 1;
-}
-
-.edu-card-footer {
-  border-top: 1px dashed #27272a;
-  padding-top: 1rem;
-  margin-top: auto;
-}
-
-.edu-terminal-stamp {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: #71717a;
-  letter-spacing: 0.12em;
-}
-
-/* Industrial Partners Showcase */
-.edu-partners-container {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px dashed #27272a;
-  margin-bottom: 0.5rem;
-}
-
-.edu-partners-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  margin-bottom: 1rem;
-}
-
-.edu-partners-tag {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: #22c55e;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.edu-partners-sub {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+.edu-inst-note {
+  font-size: 0.82rem;
   color: #a1a1aa;
+  line-height: 1.35;
+}
+
+/* Natural Overview Paragraph */
+.edu-overview {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #a1a1aa;
+  margin-bottom: 1.6rem;
+}
+
+/* Academic Industrial Partners Block */
+.edu-partners-container {
+  margin-top: auto;
+  padding-top: 1.4rem;
+  border-top: 1px dashed #27272a;
+}
+
+.edu-partners-heading {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #22c55e;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
 }
 
 .edu-partners-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .edu-partner-card {
   background: #141414;
   border: 1px solid #27272a;
-  padding: 0.85rem;
+  border-radius: 2px;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.6rem;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -261,11 +182,10 @@
 .edu-partner-logo-box {
   background: #ffffff;
   border-radius: 2px;
-  height: 48px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
 }
 
 .edu-partner-logo {
@@ -275,30 +195,20 @@
   display: block;
 }
 
-.edu-partner-meta {
+.edu-partner-details {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-}
-
-.edu-partner-tag-pill {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #facc15;
-  letter-spacing: 0.08em;
-  font-weight: 600;
+  gap: 0.15rem;
 }
 
 .edu-partner-name {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--concrete-white);
-  letter-spacing: 0.05em;
+  color: #f4f4f5;
 }
 
 .edu-partner-role {
-  font-family: var(--font-mono);
   font-size: 0.72rem;
   color: #a1a1aa;
   line-height: 1.35;
@@ -308,7 +218,7 @@
 @media (max-width: 768px) {
   .education-grid {
     grid-template-columns: 1fr;
-    gap: 2.2rem;
+    gap: 2rem;
   }
 
   .education-card {
@@ -322,11 +232,11 @@
   }
 
   .edu-logo-wrapper {
-    height: 80px;
+    height: 75px;
   }
 
   .edu-partners-grid {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 }
