@@ -11,7 +11,7 @@
 }
 
 .verifications-header-wrap {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .verifications-meta {
@@ -25,171 +25,39 @@
   margin-bottom: 0.75rem;
 }
 
-.meta-badge-count {
-  background: var(--accent-red);
-  color: #fff;
-  padding: 3px 10px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
+/* TOP: ACHIEVEMENTS SECTION */
+.achievements-container {
+  margin-top: 1.5rem;
+  margin-bottom: 4.5rem;
 }
 
-.verifications-subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  color: #a0a0a0;
-  line-height: 1.6;
-  max-width: 800px;
-  margin-top: 1rem;
-}
-
-/* View Mode Switcher */
-.view-mode-bar {
+.achievements-title-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-top: 2rem;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #222;
-}
-
-.tab-buttons {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.mode-btn {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  letter-spacing: 1px;
-  padding: 0.6rem 1.4rem;
-  background: #111;
-  color: #aaa;
-  border: 2px solid #333;
-  transition: all 0.2s ease;
-  cursor: pointer !important;
-}
-
-.mode-btn:hover {
-  color: #fff;
-  border-color: #666;
-}
-
-.mode-btn.active {
-  background: var(--concrete-white);
-  color: var(--asphalt-black);
-  border-color: var(--concrete-white);
-  box-shadow: 4px 4px 0px var(--accent-red);
-}
-
-.credly-profile-link {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
-  color: var(--accent-red);
-  text-decoration: none;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--accent-red);
-  transition: all 0.2s ease;
-}
-
-.credly-profile-link:hover {
-  background: var(--accent-red);
-  color: #fff;
-}
-
-/* Badges Controls */
-.badges-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-bottom: 2.5rem;
-}
-
-.category-chips {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.chip-btn {
-  background: #111;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
   color: #888;
-  border: 1px solid #333;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  padding: 0.45rem 1rem;
-  transition: all 0.2s ease;
-  cursor: pointer !important;
+  border-bottom: 1px solid #222;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.75rem;
 }
 
-.chip-btn:hover {
-  color: #fff;
-  border-color: #555;
-}
-
-.chip-btn.active {
-  background: var(--accent-red);
-  color: #fff;
-  border-color: var(--accent-red);
+.achievements-label {
+  color: #aaa;
   font-weight: 700;
 }
 
-.search-wrap {
-  display: flex;
-  align-items: center;
-  background: #111;
-  border: 1px solid #333;
-  padding: 0.45rem 0.85rem;
-  width: 340px;
-  max-width: 100%;
-}
-
-.search-prompt {
+.achievements-count {
   color: var(--accent-red);
-  font-family: var(--font-mono);
-  font-weight: bold;
-  margin-right: 0.6rem;
+  font-weight: 700;
 }
 
-.badge-search-input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  width: 100%;
-  outline: none;
-}
-
-.badge-search-input::placeholder {
-  color: #555;
-}
-
-.clear-search-btn {
-  background: none;
-  border: none;
-  color: #777;
-  font-size: 0.9rem;
-  cursor: pointer !important;
-  padding: 0 0.3rem;
-}
-
-.clear-search-btn:hover {
-  color: #fff;
-}
-
-/* Badges Grid */
+/* BADGES GRID */
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
 }
 
@@ -245,12 +113,12 @@
   justify-content: center;
   align-items: center;
   padding: 1.25rem 0;
-  min-height: 140px;
+  min-height: 130px;
 }
 
 .badge-icon-img {
-  width: 110px;
-  height: 110px;
+  width: 105px;
+  height: 105px;
   object-fit: contain;
   filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.7));
   transition: transform 0.3s ease;
@@ -319,32 +187,107 @@
   color: var(--accent-red);
 }
 
-/* No results state */
-.no-badges-found {
-  padding: 4rem 2rem;
+/* MORE CARD (REDIRECT TO CREDLY ACC) */
+.badge-card-more {
+  background: #0f0f0f;
+  border: 2px dashed #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-family: var(--font-mono);
-  color: #777;
-  background: #0d0d0d;
-  border: 2px dashed #222;
-}
-
-.reset-filter-btn {
-  margin-top: 1rem;
-  background: var(--accent-red);
-  color: #fff;
-  border: none;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  padding: 0.5rem 1.2rem;
   cursor: pointer !important;
 }
 
-/* Institutional Certs List */
+.badge-card-more:hover {
+  border-color: var(--accent-red);
+  border-style: solid;
+  background: #151515;
+  box-shadow: 6px 6px 0px var(--accent-red);
+}
+
+.more-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem 0;
+}
+
+.more-badge-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #777;
+  letter-spacing: 1px;
+}
+
+.more-hero-number {
+  font-family: var(--font-display);
+  font-size: 3.8rem;
+  color: var(--accent-red);
+  line-height: 1;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.more-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.more-desc {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #888;
+  line-height: 1.45;
+  margin: 0.75rem 0 1.5rem;
+  max-width: 220px;
+}
+
+.more-action-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--accent-red);
+  color: #fff;
+  padding: 0.55rem 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.badge-card-more:hover .more-action-btn {
+  background: #fff;
+  color: var(--asphalt-black);
+}
+
+/* AFTER: INSTITUTIONAL CERTS SECTION */
+.certs-section-wrap {
+  margin-top: 1rem;
+}
+
+.certs-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: #888;
+  border-bottom: 1px solid #222;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.certs-label {
+  color: #aaa;
+  font-weight: 700;
+}
+
 .cert-list {
   list-style-type: none;
-  margin-top: 2rem;
-  margin-bottom: 3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 4.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -352,7 +295,7 @@
 
 .cert-item {
   font-family: var(--font-mono);
-  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.2rem, 3vw, 2rem);
   background: #111;
   padding: 1rem 2rem;
   border-left: 8px solid var(--concrete-white);
@@ -370,29 +313,11 @@
   margin-right: 1rem;
 }
 
-/* Access DB Container */
+/* CREDENTIAL DATABASE ACTION */
 .db-access-container {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-top: 4rem;
-}
-
-.credly-main-action {
-  display: inline-block;
-  text-decoration: none;
-  background: var(--accent-red);
-  color: #fff;
-  font-size: clamp(1.2rem, 3vw, 2.2rem);
-  padding: 1.5rem 3rem;
-  border: 6px solid var(--asphalt-black);
-  transition: all 0.2s ease;
-}
-
-.credly-main-action:hover {
-  background: #fff;
-  color: var(--asphalt-black);
-  box-shadow: 12px 12px 0px var(--accent-red);
+  justify-content: flex-start;
+  margin-top: 2rem;
 }
 
 .massive-block-link {
@@ -400,46 +325,33 @@
   text-decoration: none;
   background: var(--concrete-white);
   color: var(--asphalt-black);
-  font-size: clamp(1.2rem, 3vw, 2.2rem);
-  padding: 1.5rem 3rem;
-  border: 6px solid var(--asphalt-black);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  padding: 2rem 4rem;
+  border: 8px solid var(--asphalt-black);
   transition: all 0.2s ease;
 }
 
 .massive-block-link:hover {
-  background: var(--industrial-cream);
-  color: var(--asphalt-black);
-  box-shadow: 12px 12px 0px #fff;
+  background: var(--accent-red);
+  color: var(--concrete-white);
+  box-shadow: 15px 15px 0px var(--concrete-white);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
   .badges-grid {
     grid-template-columns: 1fr;
   }
   
-  .view-mode-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .badges-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-wrap {
-    width: 100%;
-  }
-
-  .db-access-container {
-    flex-direction: column;
-  }
-
-  .credly-main-action,
   .massive-block-link {
     width: 100%;
     text-align: center;
-    padding: 1.2rem 1.5rem;
+    padding: 1.25rem 1.5rem;
     font-size: 1.25rem;
   }
 }
