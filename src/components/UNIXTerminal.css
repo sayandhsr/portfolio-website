@@ -68,6 +68,12 @@
   flex-direction: column;
   box-shadow: -10px 10px 0px rgba(0, 0, 0, 0.9);
   overflow: hidden;
+  transition: width 0.2s ease, height 0.2s ease;
+}
+
+.terminal-window.gbx-expanded-window {
+  width: min(840px, calc(100vw - 2rem));
+  height: min(720px, calc(100vh - 3rem));
 }
 
 @media (max-width: 600px) {

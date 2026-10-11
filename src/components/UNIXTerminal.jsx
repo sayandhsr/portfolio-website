@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { SnakeGame, BreakoutGame } from './Games';
+import GameBoyHub from '../gameboy/GameBoyHub';
+import { isGameBoyTrigger } from '../gameboy/triggerMatcher';
 import './UNIXTerminal.css';
 
 // API Keys strictly from environment
@@ -240,7 +241,9 @@ or enter any query to search.`;
   const [spinnerFrame, setSpinnerFrame] = useState(0);
   const [loadingStage, setLoadingStage] = useState(0);
   const endOfMessagesRef = useRef(null);
-  const [activeGame, setActiveGame] = useState(null);
+  const chatInputRef = useRef(null);
+  const [showGameBoy, setShowGameBoy] = useState(false);
+  const [isTerminalExpanded, setIsTerminalExpanded] = useState(false);
 
   // Spinner & Loading Stage Cycler (Claude / Codex CLI style)
   useEffect(() => {
@@ -355,26 +358,17 @@ or enter any query to search.`;
       return;
     }
 
-    // 4. RETRO GAMES
-    if (cleanCmd === 'game' || cleanCmd === 'games' || cleanCmd === 'arcade') {
-      setMessages(prev => [
-        ...prev,
-        {
-          sender: 'system',
-          text: `[RETRO ARCADE]\nselect a module:\n> snake\n> bubble`,
-          typing: false
-        }
-      ]);
-      return;
+    // 4. GAME BOY TRIGGER & EXIT
+    if (cleanCmd === 'exit' || cleanCmd === 'quit') {
+      if (showGameBoy) {
+        setShowGameBoy(false);
+        setTimeout(() => chatInputRef.current?.focus(), 50);
+        return;
+      }
     }
 
-    if (cleanCmd === 'snake') {
-      setActiveGame('snake');
-      return;
-    }
-
-    if (cleanCmd === 'bubble' || cleanCmd === 'breakout') {
-      setActiveGame('bubble');
+    if (isGameBoyTrigger(cleanCmd)) {
+      setShowGameBoy(true);
       return;
     }
 
@@ -399,7 +393,7 @@ experience - professional timeline & certificates
 badges     - 23 verified credly badges (IBM / Google)
 contact    - direct comm channels
 education  - academic credentials
-game       - retro arcade (snake / bubble)
+game       - retro game boy arcade
 audio      - toggle terminal audio
 clear      - clear terminal buffer`;
     }
@@ -649,7 +643,7 @@ x/tw     : https://twitter.com/SayandhSr`;
 
       {/* TERMINAL WINDOW */}
       {isOpen && (
-        <div className="terminal-window" role="dialog" aria-label="Terminal CLI">
+        <div className={`terminal-window ${isTerminalExpanded ? 'gbx-expanded-window' : ''}`} role="dialog" aria-label="Terminal CLI">
           {/* WINDOW HEADER: MONOCHROME, NO CANDY DOTS */}
           <div className="terminal-header">
             <div className="terminal-header-title">
@@ -685,74 +679,73 @@ x/tw     : https://twitter.com/SayandhSr`;
             </div>
           </div>
 
-          {/* TERMINAL MESSAGE STREAM */}
-          <div className="terminal-body" style={activeGame ? { padding: 0 } : {}}>
-            {activeGame === 'snake' && (
-              <SnakeGame
-                audioEnabled={audioEnabled}
-                onExit={() => setActiveGame(null)}
-              />
-            )}
-            {activeGame === 'bubble' && (
-              <BreakoutGame
-                audioEnabled={audioEnabled}
-                onExit={() => setActiveGame(null)}
-              />
-            )}
+          {showGameBoy ? (
+            <GameBoyHub
+              onExit={() => {
+                setShowGameBoy(false);
+                setTimeout(() => chatInputRef.current?.focus(), 50);
+              }}
+              onToggleExpand={() => setIsTerminalExpanded(prev => !prev)}
+              isExpanded={isTerminalExpanded}
+            />
+          ) : (
+            <>
+              {/* TERMINAL MESSAGE STREAM */}
+              <div className="terminal-body">
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`cli-entry ${msg.sender}`}>
+                    <div className="cli-prompt-line">
+                      <span className={`cli-prompt ${msg.sender}`}>
+                        {msg.sender === 'user' ? 'guest@sys:~$' : 'sayandh@cli:~$'}
+                      </span>
+                    </div>
 
-            {!activeGame && messages.map((msg, idx) => (
-              <div key={idx} className={`cli-entry ${msg.sender}`}>
-                <div className="cli-prompt-line">
-                  <span className={`cli-prompt ${msg.sender}`}>
-                    {msg.sender === 'user' ? 'guest@sys:~$' : 'sayandh@cli:~$'}
-                  </span>
-                </div>
+                    <div className="cli-output">
+                      {msg.typing ? (
+                        <TypewriterText
+                          text={msg.text}
+                          onComplete={() => markTypingComplete(idx)}
+                          audioEnabledRef={audioEnabledRef}
+                          audioCtxRef={audioCtxRef}
+                        />
+                      ) : (
+                        <FormattedTerminalText
+                          text={msg.text}
+                          onCommandClick={(cmd) => executeUserCommand(cmd)}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
 
-                <div className="cli-output">
-                  {msg.typing ? (
-                    <TypewriterText
-                      text={msg.text}
-                      onComplete={() => markTypingComplete(idx)}
-                      audioEnabledRef={audioEnabledRef}
-                      audioCtxRef={audioCtxRef}
-                    />
-                  ) : (
-                    <FormattedTerminalText
-                      text={msg.text}
-                      onCommandClick={(cmd) => executeUserCommand(cmd)}
-                    />
-                  )}
-                </div>
+                {/* CLAUDE / CODEX TERMINAL AGENT SPINNER LINE */}
+                {isProcessing && (
+                  <div className="cli-entry ai loading-entry">
+                    <span className="cli-prompt ai">sayandh@cli:~$</span>
+                    <span className="cli-spinner">{SPINNER_FRAMES[spinnerFrame]}</span>
+                    <span className="cli-stage-text">{AI_STAGES[loadingStage]}</span>
+                  </div>
+                )}
+
+                <div ref={endOfMessagesRef} />
               </div>
-            ))}
 
-            {/* CLAUDE / CODEX TERMINAL AGENT SPINNER LINE */}
-            {!activeGame && isProcessing && (
-              <div className="cli-entry ai loading-entry">
-                <span className="cli-prompt ai">sayandh@cli:~$</span>
-                <span className="cli-spinner">{SPINNER_FRAMES[spinnerFrame]}</span>
-                <span className="cli-stage-text">{AI_STAGES[loadingStage]}</span>
-              </div>
-            )}
-
-            {!activeGame && <div ref={endOfMessagesRef} />}
-          </div>
-
-          {/* INPUT PROMPT */}
-          {!activeGame && (
-            <form className="terminal-input-form" onSubmit={handleSend}>
-              <span className="cli-input-prompt">guest@sys:~$</span>
-              <input
-                type="text"
-                className="cli-input"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="type command or ask anything..."
-                disabled={isProcessing}
-                autoFocus
-              />
-              <span className="cli-cursor-blink">▋</span>
-            </form>
+              {/* INPUT PROMPT */}
+              <form className="terminal-input-form" onSubmit={handleSend}>
+                <span className="cli-input-prompt">guest@sys:~$</span>
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  className="cli-input"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="type command or ask anything..."
+                  disabled={isProcessing}
+                  autoFocus
+                />
+                <span className="cli-cursor-blink">▋</span>
+              </form>
+            </>
           )}
         </div>
       )}
