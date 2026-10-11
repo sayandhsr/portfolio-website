@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import GameBoyHub from '../gameboy/GameBoyHub';
-import { classifyTerminalCommand, DIRECTIVE_RESPONSES, getSystemClockString } from './terminalRouter';
+import { classifyTerminalCommand, DIRECTIVE_RESPONSES, getSystemClockString, buildChatHistory } from './terminalRouter';
 import './UNIXTerminal.css';
 
 // API Keys strictly from environment
@@ -14,7 +14,12 @@ const getSystemPrompt = () => {
   return `You are the CLI terminal agent of Sayandh Raj, powered by spurce.ai.
 Format: Raw Unix terminal output. Monospace, plain text.
 Style: Concise, technical, hacker/CLI. NO markdown bold headers (**), NO unnecessary markdown formatting. Use clean indentation, dashes (-), or key: value format.
-You can answer ANY question (general knowledge, science, computing, "gold", coding, algorithms, explanations) as well as questions regarding Sayandh Raj.
+You can answer ANY question (general knowledge, science, computing, "gold", coding, algorithms, history, explanations) as well as questions regarding Sayandh Raj.
+
+CONVERSATION CONTINUITY & CONTEXT:
+Maintain full conversational continuity across multi-turn exchanges.
+If the user asks follow-up questions (e.g. "full name?", "who is he?", "when?", "why?", "tell me more", "how does that work?"), ALWAYS interpret and answer in the context of the active subject being discussed in the recent conversation turns.
+Do NOT assume the user is asking about Sayandh Raj unless the conversation is specifically about Sayandh Raj or the user explicitly asks about Sayandh Raj.
 
 Sayandh Raj Facts:
 - AI/ML Engineer & Data Architect.
@@ -404,10 +409,13 @@ or enter any query to search.`;
     let replyText = '';
     let aiSuccess = false;
 
+    // Build multi-turn conversational history to maintain continuity across follow-up queries
+    const { geminiContents, openRouterHistory } = buildChatHistory(messages, userMsg);
+
     try {
       const geminiBody = JSON.stringify({
         system_instruction: { parts: [{ text: getSystemPrompt() }] },
-        contents: [{ parts: [{ text: userMsg }] }],
+        contents: geminiContents,
         generationConfig: { maxOutputTokens: 600 }
       });
 
@@ -442,7 +450,7 @@ or enter any query to search.`;
             max_tokens: 600,
             messages: [
               { role: "system", content: getSystemPrompt() },
-              { role: "user", content: userMsg }
+              ...openRouterHistory
             ]
           })
         });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyTerminalCommand, DIRECTIVE_RESPONSES } from '../src/components/terminalRouter.js';
+import { classifyTerminalCommand, DIRECTIVE_RESPONSES, buildChatHistory } from '../src/components/terminalRouter.js';
 
 test('Terminal Router: General knowledge and technical questions route strictly to REMOTE_AI', () => {
   const generalQueries = [
@@ -145,3 +145,33 @@ test('Terminal Router: Directive responses have non-empty valid content', () => 
   assert.ok(DIRECTIVE_RESPONSES.EDUCATION.includes('IBM'));
   assert.ok(DIRECTIVE_RESPONSES.EDUCATION.includes('TCS iON'));
 });
+
+test('Terminal Router: buildChatHistory constructs valid multi-turn payloads for Gemini and OpenRouter', () => {
+  const mockMessages = [
+    { sender: 'system', text: 'system online. spurce.ai neural backend linked.' },
+    { sender: 'user', text: 'who is the father of nation?' },
+    { sender: 'ai', text: 'Mahatma Gandhi\n\n[via spurce.ai]' },
+    { sender: 'system', text: 'audio hardware: ONLINE' }
+  ];
+
+  const { geminiContents, openRouterHistory } = buildChatHistory(mockMessages, 'full name?');
+
+  // 1. Gemini payload structure
+  assert.equal(geminiContents.length, 3, 'Gemini contents should contain 3 turns');
+  assert.equal(geminiContents[0].role, 'user');
+  assert.equal(geminiContents[0].parts[0].text, 'who is the father of nation?');
+  assert.equal(geminiContents[1].role, 'model');
+  assert.equal(geminiContents[1].parts[0].text, 'Mahatma Gandhi', 'Should strip [via spurce.ai] footer');
+  assert.equal(geminiContents[2].role, 'user');
+  assert.equal(geminiContents[2].parts[0].text, 'full name?');
+
+  // 2. OpenRouter payload structure
+  assert.equal(openRouterHistory.length, 3, 'OpenRouter history should contain 3 messages');
+  assert.equal(openRouterHistory[0].role, 'user');
+  assert.equal(openRouterHistory[0].content, 'who is the father of nation?');
+  assert.equal(openRouterHistory[1].role, 'assistant');
+  assert.equal(openRouterHistory[1].content, 'Mahatma Gandhi');
+  assert.equal(openRouterHistory[2].role, 'user');
+  assert.equal(openRouterHistory[2].content, 'full name?');
+});
+

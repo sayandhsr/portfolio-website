@@ -259,3 +259,65 @@ export const classifyTerminalCommand = (rawInput) => {
   // Default: Any other question or query goes to remote AI (spurce.ai)
   return { type: 'REMOTE_AI' };
 };
+
+/**
+ * Builds multi-turn conversation payloads for Gemini and OpenRouter APIs.
+ * Preserves context continuity so follow-up queries ("full name?", "why?", "tell me more")
+ * have access to prior user and assistant exchanges.
+ */
+export const buildChatHistory = (messages, currentQuery, maxTurns = 12) => {
+  const rawHistory = [];
+  if (Array.isArray(messages)) {
+    for (const m of messages) {
+      if (!m || !m.text) continue;
+      if (m.sender === 'user') {
+        const text = m.text.trim();
+        if (text) rawHistory.push({ role: 'user', text });
+      } else if (m.sender === 'ai') {
+        // Strip the [via spurce.ai] footer from historical messages
+        const cleanText = m.text.replace(/\s*\[via\s+spurce\.ai\]\s*$/i, '').trim();
+        if (cleanText) rawHistory.push({ role: 'assistant', text: cleanText });
+      }
+    }
+  }
+
+  // Take the most recent turns up to maxTurns
+  const sliced = rawHistory.slice(-maxTurns);
+
+  // Gemini contents requires strictly alternating 'user' and 'model' turns,
+  // starting with 'user' and ending with 'user' (currentQuery)
+  const geminiContents = [];
+  let lastRole = null;
+
+  for (const item of sliced) {
+    const geminiRole = item.role === 'user' ? 'user' : 'model';
+    if (geminiContents.length === 0 && geminiRole !== 'user') {
+      // First turn in Gemini must be user
+      continue;
+    }
+    if (geminiRole === lastRole) {
+      // Merge consecutive identical roles to satisfy strict alternation requirement
+      geminiContents[geminiContents.length - 1].parts[0].text += '\n' + item.text;
+    } else {
+      geminiContents.push({ role: geminiRole, parts: [{ text: item.text }] });
+      lastRole = geminiRole;
+    }
+  }
+
+  // Append current query
+  if (lastRole === 'user' && geminiContents.length > 0) {
+    geminiContents[geminiContents.length - 1].parts[0].text += '\n' + currentQuery.trim();
+  } else {
+    geminiContents.push({ role: 'user', parts: [{ text: currentQuery.trim() }] });
+  }
+
+  // OpenRouter messages: { role: 'user' | 'assistant', content }
+  const openRouterHistory = sliced.map(item => ({
+    role: item.role === 'user' ? 'user' : 'assistant',
+    content: item.text
+  }));
+  openRouterHistory.push({ role: 'user', content: currentQuery.trim() });
+
+  return { geminiContents, openRouterHistory };
+};
+
