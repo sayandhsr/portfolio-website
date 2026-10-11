@@ -175,3 +175,39 @@ test('Terminal Router: buildChatHistory constructs valid multi-turn payloads for
   assert.equal(openRouterHistory[2].content, 'full name?');
 });
 
+test('Terminal Router: Bad words in Malayalam and English route to PROFANITY with correct response', () => {
+  const abusiveQueries = [
+    'myre',
+    'poda',
+    'nayi naya',
+    'patti',
+    'poda myre',
+    'thendi',
+    'thayoli',
+    'pulayadi',
+    'oombu',
+    'kunna',
+    'പോടാ',
+    'മൈരേ',
+    'fuck',
+    'fuck off',
+    'you bitch',
+    'asshole',
+    'shut up',
+    'bastard',
+    'dumbass'
+  ];
+
+  for (const q of abusiveQueries) {
+    const res = classifyTerminalCommand(q);
+    assert.equal(res.type, 'PROFANITY', `Expected "${q}" to be classified as PROFANITY`);
+  }
+
+  assert.equal(
+    DIRECTIVE_RESPONSES.PROFANITY,
+    'get a life instead of ragebaiting with a bot.',
+    'PROFANITY response must match requested ragebait reply'
+  );
+});
+
+

@@ -104,7 +104,9 @@ linkedin : https://linkedin.com/in/sayandh-raj
 kaggle   : https://kaggle.com/sayandhsr
 x/tw     : https://twitter.com/SayandhSr`,
 
-  MATCHA: `[BUY A MATCHA]\nprotocol : direct UPI\nupi id   : sayandhsr123-2@okicici\npayee    : Sayandh Raj\nlink     : upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR`
+  MATCHA: `[BUY A MATCHA]\nprotocol : direct UPI\nupi id   : sayandhsr123-2@okicici\npayee    : Sayandh Raj\nlink     : upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR`,
+
+  PROFANITY: `get a life instead of ragebaiting with a bot.`
 };
 
 export const getSystemClockString = () => {
@@ -112,10 +114,13 @@ export const getSystemClockString = () => {
   return `system clock: ${now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`;
 };
 
+// Profanity & abuse patterns in Malayalam (Manglish & Malayalam script) and English
+export const PROFANITY_PATTERN = /\b(myr|myre|myru|maire|mairu|poda|podi|pode|nayi|naya|naayi|naaye|naayinte|patti|pattinte|thendi|thendikal|thayoli|pulayaadi|pulayadi|kunna|oombu|oomb|oombi|koothichi|vedichi|chunni|andi|fuck|fucking|fucker|fucked|fck|stfu|bitch|bitches|asshole|dumbass|bastard|dickhead|cunt|motherfucker|mf)\b|\b(shut\s+up|piss\s+off|get\s+lost)\b|(മൈരേ|മൈര്|പോടാ|പോടീ|നായീ|നായേ|പട്ടി|തെണ്ടി|ഊമ്പ്|തായോളി|കുണ്ണ)/i;
+
 /**
  * Classifies raw user input in the UNIX terminal into:
  * - Special actions: 'CLEAR', 'AUDIO', 'MATCHA', 'EXIT', 'GAMEBOY'
- * - Offline directives: 'GREETING', 'HELP', 'WHOIS', 'SKILLS', 'PROJECTS', 'KILL_SWITCH', 'UNSULLIED', 'EXPERIENCE', 'BADGES', 'EDUCATION', 'CONTACT', 'DATE_TIME'
+ * - Offline directives: 'GREETING', 'HELP', 'WHOIS', 'SKILLS', 'PROJECTS', 'KILL_SWITCH', 'UNSULLIED', 'EXPERIENCE', 'BADGES', 'EDUCATION', 'CONTACT', 'DATE_TIME', 'PROFANITY'
  * - Remote AI fallback: 'REMOTE_AI'
  *
  * Prevents greedy substring collision so general technical / conversational queries
@@ -128,6 +133,11 @@ export const classifyTerminalCommand = (rawInput) => {
   }
 
   const cleanCmd = rawInput.toLowerCase().replace(/^>\s*/, '').trim();
+
+  // 0. PROFANITY & ABUSE FILTER (Malayalam & English)
+  if (PROFANITY_PATTERN.test(cleanCmd)) {
+    return { type: 'PROFANITY' };
+  }
 
   // 1. CLEAR COMMAND
   if (cleanCmd === 'clear' || cleanCmd === 'cls') {
