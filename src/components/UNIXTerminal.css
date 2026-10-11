@@ -1,128 +1,796 @@
+/* ==========================================================================
+   UNIX TERMINAL & AI AGENT STYLESHEET
+   Cyber-Brutalist Aesthetic, High-Contrast Theming, Dynamic Neon Accents
+   ========================================================================== */
+
 .terminal-container {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
   z-index: 1000;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, 'Courier New', Courier, monospace);
 }
 
+/* ==========================================================================
+   1. FLOATING LAUNCHER BUTTON WITH TERMINAL LOGO
+   ========================================================================== */
+
 .terminal-toggle {
-  background: var(--asphalt-black);
-  color: #fff;
-  border: 2px solid #fff;
-  padding: 0.5rem 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #090d16;
+  color: #00f0ff;
+  border: 2px solid #00f0ff;
+  padding: 0.6rem 1.1rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.2);
-  transition: all 0.2s;
+  box-shadow: 4px 4px 0px rgba(0, 240, 255, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 2px;
+}
+
+.terminal-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00f0ff;
+}
+
+.terminal-btn-text {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.terminal-btn-badge {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  letter-spacing: 0.08em;
+}
+
+.terminal-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
 .terminal-toggle:hover {
-  background: #fff;
-  color: var(--asphalt-black);
-  transform: translate(-4px, -4px);
-  box-shadow: 6px 6px 0px rgba(255, 255, 255, 0.4);
+  background: #00f0ff;
+  color: #050811;
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px rgba(0, 240, 255, 0.6);
 }
+
+.terminal-toggle:hover .terminal-btn-text {
+  color: #050811;
+}
+
+.terminal-toggle:hover .terminal-btn-icon {
+  color: #050811;
+}
+
+.terminal-toggle:hover .terminal-btn-badge {
+  background: #050811;
+  color: #00f0ff;
+  border-color: #050811;
+}
+
+/* ==========================================================================
+   2. TERMINAL WINDOW CONTAINER
+   ========================================================================== */
 
 .terminal-window {
-  width: 500px;
-  height: 600px;
-  background: #050505;
-  border: 4px solid #333;
+  width: 540px;
+  height: 640px;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 4rem);
+  background: #07090e;
+  border: 3px solid #1e293b;
   display: flex;
   flex-direction: column;
-  box-shadow: -15px 15px 0px var(--asphalt-black);
+  box-shadow: -16px 16px 0px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 240, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-@media (max-width: 600px) {
-  .terminal-window {
-    width: 350px;
-    height: 500px;
-    right: 1rem;
+@media (max-width: 640px) {
+  .terminal-container {
     bottom: 1rem;
+    right: 1rem;
+  }
+  .terminal-window {
+    width: calc(100vw - 2rem);
+    height: calc(100vh - 2.5rem);
   }
 }
 
+/* ==========================================================================
+   3. HEADER WITH TERMINAL LOGO, TRAFFIC DOTS & CONTROLS
+   ========================================================================== */
+
 .terminal-header {
-  background: #222;
-  color: #aaa;
-  padding: 0.5rem 1rem;
+  background: #0d131f;
+  border-bottom: 2px solid #1e293b;
+  padding: 0.6rem 0.9rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #333;
-  font-size: 0.9rem;
+  user-select: none;
+  font-size: 0.85rem;
 }
 
-.terminal-close {
-  background: transparent;
-  color: var(--accent-red);
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 1.2rem;
+.terminal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
+
+.terminal-window-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.terminal-window-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.terminal-window-dots .dot:hover {
+  transform: scale(1.2);
+  opacity: 0.85;
+}
+
+.dot-red {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}
+
+.dot-yellow {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.dot-green {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+
+.terminal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #38bdf8;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.terminal-logo-svg {
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.terminal-title-text {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.terminal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.terminal-header-btn {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 0.25rem 0.55rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.terminal-header-btn:hover {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+/* Audio Toggle Button States */
+.terminal-header-btn.audio-btn.audio-on {
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.25);
+}
+
+.terminal-header-btn.audio-btn.audio-off {
+  border-color: #475569;
+  color: #64748b;
+  background: rgba(100, 116, 139, 0.08);
+}
+
+.terminal-header-btn.audio-btn:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.terminal-header-btn.clear-btn:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.terminal-header-btn.close-btn {
+  border-color: #ef4444;
+  color: #ef4444;
+  padding: 0.25rem 0.45rem;
+}
+
+.terminal-header-btn.close-btn:hover {
+  background: #ef4444;
+  color: #050811;
+}
+
+/* ==========================================================================
+   4. TERMINAL BODY / MESSAGE STREAM & COLOR SYSTEM
+   ========================================================================== */
 
 .terminal-body {
   flex: 1;
-  padding: 1rem;
+  padding: 1.1rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  color: #fff;
-  font-size: 1rem;
+  gap: 1.1rem;
+  background: #06090e;
+  color: #f8fafc;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  scroll-behavior: smooth;
 }
 
+/* Custom Scrollbar */
+.terminal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+}
+
+/* Message Lines */
 .t-line {
   display: flex;
-  gap: 0.8rem;
-  line-height: 1.5;
+  flex-direction: column;
+  gap: 0.35rem;
   word-wrap: break-word;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-.t-line.user .t-text {
-  color: #fff;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+.t-prompt-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Colored Prompts */
 .t-prompt {
-  white-space: nowrap;
-  color: #fff;
-  opacity: 0.8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  user-select: none;
 }
 
-.t-text {
-  white-space: pre-wrap;
+.t-prompt.user {
+  color: #38bdf8; /* Cyber Cyan */
 }
+
+.t-prompt.system {
+  color: #f59e0b; /* Amber */
+}
+
+.t-prompt.ai {
+  color: #22c55e; /* Neon Emerald */
+}
+
+/* Message Text Containers */
+.t-text-content {
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.t-line.user .t-text-content {
+  color: #e0f2fe;
+  background: rgba(56, 189, 248, 0.05);
+  padding: 0.45rem 0.7rem;
+  border-left: 3px solid #38bdf8;
+  border-radius: 0 3px 3px 0;
+}
+
+.t-line.system .t-text-content {
+  color: #fef3c7;
+}
+
+/* Processing Pulse */
+.t-processing-pulse {
+  color: #f59e0b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  animation: pulse-text 1.2s infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ==========================================================================
+   5. FORMATTED TEXT, SECTIONS & BULLETS (NOT JUST WHITE)
+   ========================================================================== */
+
+.formatted-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Section Headings [ SECTION TITLE ] */
+.terminal-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.15rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.terminal-heading .heading-bracket {
+  color: #facc15; /* Electric Gold */
+}
+
+.terminal-heading .heading-text {
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  padding: 2px 6px;
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+/* Bullet list lines */
+.terminal-bullet-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.terminal-bullet-line .bullet-sym {
+  color: #38bdf8; /* Cyan arrow */
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.terminal-bullet-line .bullet-body {
+  color: #f1f5f9;
+  flex: 1;
+}
+
+.terminal-text-line {
+  color: #f1f5f9;
+}
+
+/* ASCII Border Art */
+.terminal-ascii-art {
+  color: #22c55e; /* Neon Green */
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: pre;
+  opacity: 0.9;
+}
+
+/* Typewriter Output */
+.typewriter-output {
+  white-space: pre-wrap;
+  color: #f8fafc;
+}
+
+/* ==========================================================================
+   6. INTERACTIVE LINKS, COMMAND PILLS & ACTION TRAYS
+   ========================================================================== */
+
+/* Inline clickable links */
+.t-inline-link {
+  color: #00f0ff !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.t-inline-link:hover {
+  color: #ffffff !important;
+  background: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.t-inline-link .link-arrow {
+  font-size: 0.85em;
+  color: #38bdf8;
+}
+
+/* Inline Command Pills `command` */
+.t-cmd-pill {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  padding: 1px 7px;
+  margin: 0 3px;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 700;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.15s ease;
+}
+
+.t-cmd-pill:hover {
+  background: #22c55e;
+  color: #050811;
+  border-color: #22c55e;
+  transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+/* Action Buttons Tray (prominent click options) */
+.terminal-actions-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.terminal-action-btn {
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* External Link Action Button */
+.terminal-action-btn.action-link {
+  background: rgba(0, 240, 255, 0.08);
+  color: #00f0ff !important;
+  border: 1.5px solid #00f0ff;
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.3);
+}
+
+.terminal-action-btn.action-link:hover {
+  background: #00f0ff;
+  color: #050811 !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px rgba(0, 240, 255, 0.6), 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+/* Command Trigger Action Button */
+.terminal-action-btn.action-cmd {
+  background: rgba(250, 204, 21, 0.08);
+  color: #facc15;
+  border: 1.5px solid #facc15;
+  box-shadow: 2px 2px 0px rgba(250, 204, 21, 0.25);
+}
+
+.terminal-action-btn.action-cmd:hover {
+  background: #facc15;
+  color: #050811;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px rgba(250, 204, 21, 0.5);
+}
+
+/* Copy Action Button */
+.terminal-action-btn.action-copy {
+  background: rgba(34, 197, 94, 0.08);
+  color: #22c55e;
+  border: 1.5px solid #22c55e;
+  box-shadow: 2px 2px 0px rgba(34, 197, 94, 0.25);
+}
+
+.terminal-action-btn.action-copy:hover {
+  background: #22c55e;
+  color: #050811;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px rgba(34, 197, 94, 0.5);
+}
+
+/* ==========================================================================
+   7. INPUT FORM & PROMPT CONTROLS
+   ========================================================================== */
 
 .terminal-input-form {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background: #0a0a0a;
-  border-top: 1px solid #333;
+  padding: 0.8rem 1rem;
+  background: #0a0e17;
+  border-top: 2px solid #1e293b;
+  gap: 0.5rem;
+}
+
+.terminal-input-prompt {
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .terminal-input {
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 1rem;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 0.95rem;
   outline: none;
-  margin-left: 0.5rem;
+  letter-spacing: 0.02em;
 }
 
-.cursor-blink {
-  color: #fff;
-  animation: blink 1s step-end infinite;
+.terminal-input::placeholder {
+  color: #475569;
+  font-size: 0.82rem;
 }
 
-@keyframes blink {
+.terminal-cursor-blink {
+  color: #22c55e;
+  font-weight: 900;
+  animation: terminal-blink 1s step-end infinite;
+}
+
+@keyframes terminal-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+.terminal-submit-btn {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #38bdf8;
+  padding: 0.25rem 0.55rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.terminal-submit-btn:not(:disabled):hover {
+  background: #38bdf8;
+  color: #050811;
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+.terminal-submit-btn:disabled {
+  color: #334155;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   8. CLAUDE-STYLE BOTTOM LOADING SCREEN & SPURCE.AI ATTRIBUTION
+   ========================================================================== */
+
+/* SPURCE.AI Attribution Badge on AI Messages */
+.spurce-attribution-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+  padding: 0.15rem 0.55rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-top: 0.25rem;
+  width: fit-content;
+  user-select: none;
+}
+
+.spurce-attribution-pill .spurce-bolt {
+  color: #facc15;
+  font-size: 0.8rem;
+}
+
+.spurce-attribution-pill .spurce-text {
+  color: #38bdf8;
+}
+
+/* Claude-Style Bottom Loading Box */
+.claude-loading-box {
+  background: #090e18;
+  border: 1.5px solid rgba(0, 240, 255, 0.35);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 240, 255, 0.1);
+  animation: claudeSlideIn 0.25s ease-out;
+}
+
+@keyframes claudeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.claude-loading-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claude-loading-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 0.06em;
+}
+
+.claude-loading-sparkle {
+  color: #facc15;
+  font-size: 0.85rem;
+  animation: sparkleRotate 2.5s infinite linear;
+  display: inline-block;
+}
+
+@keyframes sparkleRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.claude-loading-label {
+  color: #38bdf8;
+}
+
+/* Pulsing Dots */
+.claude-pulsing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.claude-pulsing-dots .p-dot {
+  width: 5px;
+  height: 5px;
+  background: #00f0ff;
+  border-radius: 50%;
+  animation: pDotPulse 1.2s infinite ease-in-out;
+}
+
+.claude-pulsing-dots .dot-1 { animation-delay: 0s; }
+.claude-pulsing-dots .dot-2 { animation-delay: 0.2s; }
+.claude-pulsing-dots .dot-3 { animation-delay: 0.4s; }
+
+@keyframes pDotPulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Claude Loading Body / Stage Text */
+.claude-loading-body {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.claude-loading-spinner {
+  display: inline-block;
+  color: #22c55e;
+  font-size: 1rem;
+  animation: spinnerRotate 1s infinite linear;
+}
+
+@keyframes spinnerRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.claude-stage-text {
+  color: #e2e8f0;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s ease;
+}
+
+/* Shimmer Progress Track */
+.claude-loading-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.claude-loading-bar {
+  height: 100%;
+  width: 35%;
+  background: linear-gradient(90deg, #00f0ff, #22c55e, #facc15);
+  border-radius: 2px;
+  animation: shimmerSlide 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmerSlide {
+  0% { transform: translateX(-100%); }
+  50% { width: 55%; }
+  100% { transform: translateX(350%); width: 35%; }
+}
+

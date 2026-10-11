@@ -15,8 +15,8 @@ const gameContainerStyle = {
   overflow: 'hidden'
 };
 
-const playBeep = (ctx, type = 'eat') => {
-  if (!ctx) return;
+const playBeep = (ctx, type = 'eat', audioEnabled = false) => {
+  if (!audioEnabled || !ctx) return;
   if (ctx.state === 'suspended') {
     ctx.resume().catch(() => {});
   }
@@ -46,11 +46,19 @@ const playBeep = (ctx, type = 'eat') => {
   } catch (e) {}
 };
 
-export const SnakeGame = ({ onExit }) => {
+export const SnakeGame = ({ onExit, audioEnabled = false }) => {
   const canvasRef = useRef(null);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const audioCtxRef = useRef(null);
+  const audioEnabledRef = useRef(audioEnabled);
+  
+  useEffect(() => {
+    audioEnabledRef.current = audioEnabled;
+    if (!audioEnabled && audioCtxRef.current && audioCtxRef.current.state === 'running') {
+      audioCtxRef.current.suspend().catch(() => {});
+    }
+  }, [audioEnabled]);
   
   const gridSize = 15;
   const tileCountX = 20;
@@ -65,7 +73,7 @@ export const SnakeGame = ({ onExit }) => {
   useEffect(() => {
     audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
     const handleKeyDown = (e) => {
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      if (audioEnabledRef.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
         audioCtxRef.current.resume();
       }
       switch (e.key) {
@@ -92,7 +100,7 @@ export const SnakeGame = ({ onExit }) => {
     let touchStartY = 0;
 
     const handleTouchStart = (e) => {
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      if (audioEnabledRef.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
         audioCtxRef.current.resume();
       }
       touchStartX = e.touches[0].clientX;
@@ -181,7 +189,7 @@ export const SnakeGame = ({ onExit }) => {
     for (let part of snake.current) {
       if (part.x === head.x && part.y === head.y) {
         setGameOver(true);
-        playBeep(audioCtxRef.current, 'die');
+        playBeep(audioCtxRef.current, 'die', audioEnabledRef.current);
         return;
       }
     }
@@ -191,7 +199,7 @@ export const SnakeGame = ({ onExit }) => {
     // Eat apple
     if (head.x === apple.current.x && head.y === apple.current.y) {
       setScore(s => s + 10);
-      playBeep(audioCtxRef.current, 'eat');
+      playBeep(audioCtxRef.current, 'eat', audioEnabledRef.current);
       spawnApple();
     } else {
       snake.current.pop();
@@ -248,12 +256,20 @@ export const SnakeGame = ({ onExit }) => {
   );
 };
 
-export const BreakoutGame = ({ onExit }) => {
+export const BreakoutGame = ({ onExit, audioEnabled = false }) => {
   const canvasRef = useRef(null);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
   const audioCtxRef = useRef(null);
+  const audioEnabledRef = useRef(audioEnabled);
+
+  useEffect(() => {
+    audioEnabledRef.current = audioEnabled;
+    if (!audioEnabled && audioCtxRef.current && audioCtxRef.current.state === 'running') {
+      audioCtxRef.current.suspend().catch(() => {});
+    }
+  }, [audioEnabled]);
 
   const paddleHeight = 10;
   const paddleWidth = 60;
@@ -291,7 +307,7 @@ export const BreakoutGame = ({ onExit }) => {
   useEffect(() => {
     audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
     const handleKeyDown = (e) => {
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      if (audioEnabledRef.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
         audioCtxRef.current.resume();
       }
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
@@ -308,7 +324,7 @@ export const BreakoutGame = ({ onExit }) => {
     const handleTouch = (e) => {
       e.preventDefault(); // Prevent scrolling
       if (!canvasRef.current) return;
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      if (audioEnabledRef.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
         audioCtxRef.current.resume().catch(() => {});
       }
       const rect = canvasRef.current.getBoundingClientRect();
@@ -389,7 +405,7 @@ export const BreakoutGame = ({ onExit }) => {
             ball.current.dy = -ball.current.dy;
             b.status = 0;
             setScore(s => s + 10);
-            playBeep(audioCtxRef.current, 'break');
+            playBeep(audioCtxRef.current, 'break', audioEnabledRef.current);
           }
         }
       }
@@ -403,20 +419,20 @@ export const BreakoutGame = ({ onExit }) => {
     // Collision detection with walls
     if (ball.current.x + ball.current.dx > canvas.width - ballRadius || ball.current.x + ball.current.dx < ballRadius) {
       ball.current.dx = -ball.current.dx;
-      playBeep(audioCtxRef.current, 'bounce');
+      playBeep(audioCtxRef.current, 'bounce', audioEnabledRef.current);
     }
     if (ball.current.y + ball.current.dy < ballRadius) {
       ball.current.dy = -ball.current.dy;
-      playBeep(audioCtxRef.current, 'bounce');
+      playBeep(audioCtxRef.current, 'bounce', audioEnabledRef.current);
     } else if (ball.current.y + ball.current.dy > canvas.height - ballRadius) {
       if (ball.current.x > paddleX.current && ball.current.x < paddleX.current + paddleWidth) {
         ball.current.dy = -ball.current.dy;
         // Add a bit of english depending on where it hit
         ball.current.dx = ball.current.dx + (ball.current.x - (paddleX.current + paddleWidth/2)) * 0.1;
-        playBeep(audioCtxRef.current, 'bounce');
+        playBeep(audioCtxRef.current, 'bounce', audioEnabledRef.current);
       } else {
         setGameOver(true);
-        playBeep(audioCtxRef.current, 'die');
+        playBeep(audioCtxRef.current, 'die', audioEnabledRef.current);
         return;
       }
     }
