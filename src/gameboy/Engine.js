@@ -96,8 +96,8 @@ export class Engine {
 
       // Fixed timestep updates
       while (this.accumulator >= this.step) {
-        if (this.input) this.input.update();
         if (this.onUpdate) this.onUpdate(this.step, this.input);
+        if (this.input) this.input.update();
         this.accumulator -= this.step;
       }
 

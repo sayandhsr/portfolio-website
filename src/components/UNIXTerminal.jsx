@@ -643,7 +643,7 @@ x/tw     : https://twitter.com/SayandhSr`;
 
       {/* TERMINAL WINDOW */}
       {isOpen && (
-        <div className={`terminal-window ${isTerminalExpanded ? 'gbx-expanded-window' : ''}`} role="dialog" aria-label="Terminal CLI">
+        <div className={`terminal-window ${showGameBoy ? 'gbx-active-window' : ''} ${isTerminalExpanded ? 'gbx-expanded-window' : ''}`} role="dialog" aria-label="Terminal CLI">
           {/* WINDOW HEADER: MONOCHROME, NO CANDY DOTS (Hidden when Game Boy provides its own header) */}
           {!showGameBoy && (
             <div className="terminal-header">

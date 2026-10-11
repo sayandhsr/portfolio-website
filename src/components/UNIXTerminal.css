@@ -71,9 +71,14 @@
   transition: width 0.2s ease, height 0.2s ease;
 }
 
+.terminal-window.gbx-active-window {
+  width: min(740px, calc(100vw - 1.5rem));
+  height: min(800px, calc(100vh - 2rem));
+}
+
 .terminal-window.gbx-expanded-window {
-  width: min(840px, calc(100vw - 2rem));
-  height: min(720px, calc(100vh - 3rem));
+  width: min(960px, calc(100vw - 1rem));
+  height: min(860px, calc(100vh - 1.5rem));
 }
 
 @media (max-width: 600px) {

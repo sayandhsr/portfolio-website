@@ -26,9 +26,9 @@
 
 /* Header inside Game Boy view */
 .gbx-header {
-  height: 34px;
-  background: #1a1a1a;
-  border-bottom: 2px solid #262626;
+  height: 32px;
+  background: #18181b;
+  border-bottom: 2px solid #27272a;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -54,13 +54,13 @@
 }
 
 .gbx-btn {
-  background: #262626;
+  background: #27272a;
   color: #e4e4e4;
   border: 1px solid #3f3f46;
   border-radius: 2px;
   padding: 2px 7px;
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -83,43 +83,48 @@
   background: #991b1b;
 }
 
-/* Main Shell Container - Layouts side-by-side or stacked */
+/* Main Shell Container - Maximizes screen space */
 .gbx-shell {
   flex: 1;
   width: 100%;
-  height: calc(100% - 34px);
+  height: calc(100% - 32px);
   display: flex;
-  background: #1e1e1e;
-  padding: 0.5rem;
+  background: #18181b;
+  padding: 6px;
   box-sizing: border-box;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   outline: none;
   touch-action: none;
   position: relative;
+  overflow: hidden;
 }
 
 .gbx-shell.layout-stacked {
   flex-direction: column;
-  gap: 0.6rem;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .gbx-shell.layout-side {
   flex-direction: row;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.2rem;
 }
 
-/* Screen Housing (Gray/Black bezel around LCD) */
+/* Screen Housing (Gray bezel surrounding LCD) */
 .gbx-screen-housing {
-  background: #2b2b2b;
+  background: #27272a;
   border: 2px solid #3f3f46;
   border-radius: 4px;
-  padding: 8px 10px;
+  padding: 4px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.75);
   position: relative;
+  cursor: pointer;
+  max-width: 100%;
 }
 
 .gbx-screen-top-bar {
@@ -127,8 +132,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
-  font-size: 0.62rem;
+  margin-bottom: 3px;
+  font-size: 0.60rem;
   color: #71717a;
 }
 
@@ -143,29 +148,32 @@
   height: 5px;
   border-radius: 50%;
   background: #ef4444;
-  box-shadow: 0 0 4px #ef4444;
+  box-shadow: 0 0 5px #ef4444;
 }
 
 /* Canvas Display */
 .gbx-canvas-wrapper {
-  background: #9bbc0f; /* GB screen default color */
-  border: 2px solid #141414;
+  background: #9bbc0f; /* GB LCD screen base color */
+  border: 2px solid #09090b;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  touch-action: none;
 }
 
 .gbx-canvas {
   display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  touch-action: none;
 }
 
 /* Screen Bottom Label */
 .gbx-screen-bottom-bar {
-  margin-top: 4px;
-  font-size: 0.68rem;
+  margin-top: 3px;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: #a1a1aa;
@@ -174,118 +182,145 @@
 /* Focus Warning Hint */
 .gbx-focus-hint {
   position: absolute;
-  bottom: 12px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.9);
   color: #c49a6c;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border: 1px solid #c49a6c;
-  font-size: 0.72rem;
-  pointer-events: none;
-  z-index: 20;
+  border-radius: 2px;
+  font-size: 0.70rem;
+  z-index: 25;
+  cursor: pointer;
+  animation: gbx-blink 1.5s infinite;
 }
 
-/* Controls Panel (Authentic Handheld Layout) */
+@keyframes gbx-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Controls Panel - Single sleek horizontal bar in stacked mode */
 .gbx-controls-panel {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   width: 100%;
-  max-width: 360px;
+  max-width: 680px;
+  padding: 2px 0.5rem;
   box-sizing: border-box;
+  flex-shrink: 0;
+  gap: 0.5rem;
 }
 
 .gbx-shell.layout-side .gbx-controls-panel {
   flex-direction: column;
   justify-content: center;
-  gap: 0.9rem;
+  gap: 1.2rem;
   width: auto;
-  max-width: 240px;
+  max-width: 220px;
 }
 
-.gbx-primary-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 0.75rem;
-  box-sizing: border-box;
-}
-
-.gbx-shell.layout-side .gbx-primary-controls {
-  flex-direction: column;
-  gap: 0.8rem;
-  padding: 0;
-}
-
+/* D-Pad Container */
 .gbx-dpad-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
-.gbx-action-buttons-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.gbx-control-hint {
-  font-size: 0.56rem;
-  color: #71717a;
-  letter-spacing: 0.05em;
-  user-select: none;
-}
-
-/* D-Pad Container */
 .gbx-dpad-container {
   display: grid;
-  grid-template-columns: repeat(3, 28px);
-  grid-template-rows: repeat(3, 28px);
+  grid-template-columns: repeat(3, 27px);
+  grid-template-rows: repeat(3, 27px);
   gap: 2px;
   user-select: none;
 }
 
 .gbx-dpad-btn {
-  background: #2b2b2b;
-  border: 1px solid #141414;
-  color: #a1a1aa;
-  font-size: 0.72rem;
+  background: #27272a;
+  border: 1px solid #18181b;
+  color: #e4e4e7;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   user-select: none;
   touch-action: none;
-  transition: background 0.08s ease;
+  transition: all 0.08s ease;
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.1);
 }
 
 .gbx-dpad-btn:active,
 .gbx-dpad-btn.pressed {
-  background: #52525b;
+  background: #71717a;
   color: #ffffff;
+  transform: scale(0.92);
 }
 
 .gbx-dpad-center {
-  background: #2b2b2b;
-  border: 1px solid #141414;
+  background: #27272a;
+  border: 1px solid #18181b;
 }
 
-/* A / B Action Buttons */
+/* System Buttons in Center (SELECT & START) */
+.gbx-system-buttons {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.gbx-pill-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: rotate(-25deg);
+}
+
+.gbx-pill-btn {
+  width: 38px;
+  height: 12px;
+  border-radius: 6px;
+  background: #3f3f46;
+  border: 1px solid #18181b;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.08s ease;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.gbx-pill-btn:active,
+.gbx-pill-btn.pressed {
+  background: #71717a;
+  transform: scale(0.92);
+}
+
+.gbx-pill-label {
+  font-size: 0.54rem;
+  color: #a1a1aa;
+  letter-spacing: 0.04em;
+  transform: rotate(25deg);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Action Buttons on Right (B & A) */
+.gbx-action-buttons-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .gbx-action-buttons {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.85rem;
   transform: rotate(-25deg);
   user-select: none;
-  margin-top: 6px;
-}
-
-.gbx-shell.layout-side .gbx-action-buttons {
-  margin-top: 0;
 }
 
 .gbx-round-btn-wrapper {
@@ -296,83 +331,54 @@
 }
 
 .gbx-round-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: #831843; /* Classic magenta/burgundy button tone */
+  background: #9d174d; /* Classic Game Boy burgundy tone */
   border: 2px solid #500724;
-  color: #fbcfe8;
-  font-weight: 700;
-  font-size: 0.85rem;
+  color: #fce7f3;
+  font-weight: 800;
+  font-size: 0.88rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   touch-action: none;
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.55);
   transition: all 0.08s ease;
 }
 
 .gbx-round-btn:active,
 .gbx-round-btn.pressed {
-  transform: translate(1px, 1px);
+  transform: translate(1px, 1px) scale(0.94);
   box-shadow: none;
-  background: #9d174d;
+  background: #be185d;
 }
 
 .gbx-btn-label {
-  font-size: 0.65rem;
-  color: #71717a;
+  font-size: 0.60rem;
+  color: #a1a1aa;
   transform: rotate(25deg);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-/* Pill Buttons (Select & Start) */
-.gbx-system-buttons {
-  display: flex;
-  gap: 1.2rem;
-  justify-content: center;
-  width: 100%;
-}
-
-.gbx-pill-btn-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  transform: rotate(-25deg);
-}
-
-.gbx-pill-btn {
-  width: 32px;
-  height: 10px;
-  border-radius: 6px;
-  background: #3f3f46;
-  border: 1px solid #27272a;
-  cursor: pointer;
-  touch-action: none;
-  transition: background 0.08s ease;
-}
-
-.gbx-pill-btn:active,
-.gbx-pill-btn.pressed {
-  background: #52525b;
-}
-
-.gbx-pill-label {
-  font-size: 0.58rem;
+.gbx-control-hint {
+  font-size: 0.54rem;
   color: #71717a;
   letter-spacing: 0.05em;
-  transform: rotate(25deg);
+  user-select: none;
+  white-space: nowrap;
 }
 
-/* Modal Settings Menu Overlay */
+/* Settings Modal Overlay */
 .gbx-settings-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.88);
   z-index: 50;
   display: flex;
   align-items: center;
@@ -386,17 +392,20 @@
   border-radius: 4px;
   padding: 1.2rem;
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .gbx-settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  border-bottom: 1px solid #3f3f46;
+  padding-bottom: 0.5rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #c49a6c;
 }
@@ -405,14 +414,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  gap: 0.5rem;
 }
 
 .gbx-setting-select {
   background: #27272a;
-  color: #f4f4f5;
+  color: #ffffff;
   border: 1px solid #3f3f46;
-  padding: 3px 6px;
   border-radius: 2px;
+  padding: 3px 6px;
   font-family: inherit;
+  font-size: 0.72rem;
+  outline: none;
 }
