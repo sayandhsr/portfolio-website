@@ -207,6 +207,103 @@
   letter-spacing: 0.12em;
 }
 
+/* Industrial Partners Showcase */
+.edu-partners-container {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed #27272a;
+  margin-bottom: 0.5rem;
+}
+
+.edu-partners-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+}
+
+.edu-partners-tag {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #22c55e;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.edu-partners-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #a1a1aa;
+}
+
+.edu-partners-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.edu-partner-card {
+  background: #141414;
+  border: 1px solid #27272a;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.edu-partner-card:hover {
+  border-color: #3f3f46;
+  transform: translateY(-2px);
+}
+
+.edu-partner-logo-box {
+  background: #ffffff;
+  border-radius: 2px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.edu-partner-logo {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.edu-partner-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.edu-partner-tag-pill {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #facc15;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.edu-partner-name {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--concrete-white);
+  letter-spacing: 0.05em;
+}
+
+.edu-partner-role {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #a1a1aa;
+  line-height: 1.35;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .education-grid {
@@ -226,5 +323,10 @@
 
   .edu-logo-wrapper {
     height: 80px;
+  }
+
+  .edu-partners-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 }

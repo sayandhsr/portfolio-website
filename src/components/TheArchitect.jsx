@@ -35,12 +35,12 @@ const TheArchitect = () => {
         <p ref={textRef} className="architect-bio">
           "I engineer intelligent systems and architect robust, scalable machine learning solutions. 
           Backed by a foundation in Artificial Intelligence & Data Science (BCA, Yenepoya University 
-          Bengaluru Off-Campus, 8.59 CGPA) and advanced research via an M.Sc. in Computer Science 
-          (Artificial Intelligence) at the Kerala University of Digital Sciences, Innovation and Technology 
-          (Digital University of Kerala / formerly IIITM-K), I transform complex data into actionable, 
-          high-performance infrastructure. From precision generative AI models to predictive analytics 
-          engines, my focus is on deploying heavy-duty, data-driven solutions that solve real-world 
-          infrastructural and operational bottlenecks."
+          Bengaluru Off-Campus, industrial partnerships with IBM & TCS iON, 8.59 CGPA) and advanced 
+          research via an M.Sc. in Computer Science (Artificial Intelligence) at the Kerala University 
+          of Digital Sciences, Innovation and Technology (Digital University of Kerala / formerly IIITM-K), 
+          I transform complex data into actionable, high-performance infrastructure. From precision generative AI 
+          models to predictive analytics engines, my focus is on deploying heavy-duty, data-driven solutions 
+          that solve real-world infrastructural and operational bottlenecks."
         </p>
       </div>
     </section>

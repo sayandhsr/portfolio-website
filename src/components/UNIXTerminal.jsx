@@ -19,7 +19,7 @@ Sayandh Raj Facts:
 - AI/ML Engineer & Data Architect.
 - Academic Background:
   * M.Sc. in Computer Science (Artificial Intelligence Specialization), Kerala University of Digital Sciences, Innovation and Technology (Digital University of Kerala / DUK, formerly IIITM-K), Trivandrum, Kerala (2026 – 2028, Pursuing).
-  * BCA in Artificial Intelligence & Data Science, Yenepoya (Deemed to be University), Bengaluru Off-Campus, Karnataka (Main University: Mangalore, Karnataka, India) (2023 – 2026, CGPA: 8.59/10).
+  * BCA in Artificial Intelligence & Data Science, Yenepoya (Deemed to be University), Bengaluru Off-Campus, Karnataka (Main University: Mangalore, Karnataka, India; Industrial Partners: IBM & TCS iON) (2023 – 2026, CGPA: 8.59/10).
 - Stack: Python, PyTorch, TensorFlow, SQL, R, Pandas, NumPy, Scikit-Learn, Power BI, FastAPI, LangChain, Hugging Face, Docker.
 - 23 Credly Badges: IBM AI & ML Graduate, Google Advanced Data Analytics, IBM Data Science Professional (credly.com/users/sayandhraj).
 - Deployments:
@@ -413,6 +413,7 @@ education  : 1. M.Sc. Computer Science (AI Specialization) [2026-2028, Pursuing]
              2. BCA in AI & Data Science [2023-2026, CGPA: 8.59/10]
                 Yenepoya (Deemed to be University), Bengaluru Off-Campus
                 (Main University: Mangalore, Karnataka, India)
+                Industrial Partners: IBM & TCS iON
 domain     : Deep Learning, Neural Networks, Generative AI (LLMs/RAG),
              NLP, Computer Vision, Scalable Data Pipelines
 github     : https://github.com/sayandhsr
@@ -491,12 +492,13 @@ registry: https://credly.com/users/sayandhraj`;
    focus       : Deep Learning, Neural Architectures, Autonomous AI Systems
 
 2. Bachelor of Computer Applications (BCA) in AI & Data Science
-   period      : 2023 – 2026
-   institution : Yenepoya (Deemed to be University)
-   campus      : Bengaluru Off-Campus, Karnataka
-   main campus : Mangalore, Karnataka, India
-   cgpa        : 8.59 / 10.00
-   focus       : Machine Learning, Statistical Modeling, Data Pipelines`;
+   period              : 2023 – 2026
+   institution         : Yenepoya (Deemed to be University)
+   campus              : Bengaluru Off-Campus, Karnataka
+   main campus         : Mangalore, Karnataka, India
+   industrial partners : IBM (Applied AI) & TCS iON (Big Data Logistics)
+   cgpa                : 8.59 / 10.00
+   focus               : Machine Learning, Statistical Modeling, Data Pipelines`;
     }
     // CONTACT
     else if (matchesAny(['contact', 'phone', 'email', 'mail', 'reach', 'call', 'number', 'linkedin', 'github', 'kaggle'])) {

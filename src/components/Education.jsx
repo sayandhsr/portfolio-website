@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import dukLogo from '../assets/duk-logo.png';
 import yenepoyaLogo from '../assets/yenepoya-logo.svg';
+import ibmLogo from '../assets/ibm-logo.svg';
+import tcsLogo from '../assets/tcs-logo.svg';
 import './Education.css';
 
 const educationData = [
@@ -43,6 +45,24 @@ const educationData = [
       "Specialization: Artificial Intelligence, Machine Learning & Predictive Analytics",
       "Academic Performance: Graduated with 8.59 / 10.00 CGPA distinction",
       "Location: Bengaluru Off-Campus, Karnataka (Main University: Mangalore, Karnataka, India)"
+    ],
+    partners: [
+      {
+        name: "IBM",
+        tag: "APPLIED AI PARTNER",
+        role: "Industrial Curriculum & Applied AI Programs",
+        logo: ibmLogo,
+        logoAlt: "IBM Logo",
+        padding: "6px 14px"
+      },
+      {
+        name: "TCS iON",
+        tag: "BIG DATA PARTNER",
+        role: "Applied Industry Project & Logistics Intelligence",
+        logo: tcsLogo,
+        logoAlt: "Tata Consultancy Services Logo",
+        padding: "6px 14px"
+      }
     ]
   }
 ];
@@ -154,6 +174,34 @@ const Education = () => {
                   </div>
                 ))}
               </div>
+
+              {item.partners && item.partners.length > 0 && (
+                <div className="edu-partners-container">
+                  <div className="edu-partners-header">
+                    <span className="edu-partners-tag">ACADEMIC INDUSTRIAL PARTNERS</span>
+                    <span className="edu-partners-sub">Curriculum & Applied Industry Projects</span>
+                  </div>
+                  <div className="edu-partners-grid">
+                    {item.partners.map((partner, pIdx) => (
+                      <div key={pIdx} className="edu-partner-card">
+                        <div className="edu-partner-logo-box" style={{ padding: partner.padding }}>
+                          <img
+                            src={partner.logo}
+                            alt={partner.logoAlt}
+                            className="edu-partner-logo"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="edu-partner-meta">
+                          <span className="edu-partner-tag-pill">{partner.tag}</span>
+                          <span className="edu-partner-name">{partner.name}</span>
+                          <span className="edu-partner-role">{partner.role}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="edu-card-footer">

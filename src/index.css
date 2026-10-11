@@ -4,7 +4,9 @@
   --asphalt-black: #050505;
   --concrete-white: #e4e4e4;
   --industrial-cream: #d9d5c3;
-  --accent-red: #ff3333; /* For alerts/terminals if needed */
+  --accent-red: #15803d; /* Changed from red to dark green */
+  --accent-green: #15803d; /* Dark green theme accent */
+  --accent-dark-green: #15803d;
   
   --font-display: 'Anton', sans-serif;
   --font-body: 'Inter', sans-serif;
