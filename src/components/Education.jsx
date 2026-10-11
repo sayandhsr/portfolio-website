@@ -64,17 +64,18 @@ const Education = () => {
       cardsRef.current.forEach((card) => {
         if (!card) return;
         gsap.fromTo(card,
-          { opacity: 0, y: 50 },
+          { opacity: 0, y: 30 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
+            duration: 0.6,
             ease: 'power2.out',
+            clearProps: 'all',
             scrollTrigger: {
               trigger: card,
               start: 'top 85%',
-              end: 'top 60%',
-              scrub: 1
+              toggleActions: 'play none none none',
+              once: true
             }
           }
         );
@@ -85,16 +86,18 @@ const Education = () => {
       cardsRef.current.forEach((card) => {
         if (!card) return;
         gsap.fromTo(card,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: 20 },
           {
             opacity: 1,
             y: 0,
             duration: 0.5,
+            ease: 'power2.out',
+            clearProps: 'all',
             scrollTrigger: {
               trigger: card,
               start: 'top 90%',
-              end: 'top 70%',
-              scrub: 1
+              toggleActions: 'play none none none',
+              once: true
             }
           }
         );
@@ -115,12 +118,6 @@ const Education = () => {
             className="education-card"
             ref={el => (cardsRef.current[idx] = el)}
           >
-            {/* Top Bar with timeline & status */}
-            <div className="edu-card-topbar">
-              <span className="edu-status-badge">{item.status}</span>
-              <span className="edu-period-badge">{item.period}</span>
-            </div>
-
             {/* University Logo Showcase */}
             <div className="edu-logo-wrapper" style={{ padding: item.logoPadding }}>
               <img
@@ -129,6 +126,12 @@ const Education = () => {
                 className="edu-logo-img"
                 loading="lazy"
               />
+            </div>
+
+            {/* Status & Period Metadata - Clean text below logo, no boxes */}
+            <div className="edu-card-meta">
+              <span className="edu-meta-status">{item.status}</span>
+              <span className="edu-meta-period">{item.period}</span>
             </div>
 
             {/* Degree and Major */}

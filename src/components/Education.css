@@ -21,6 +21,9 @@
   flex-direction: column;
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .education-card:hover {
@@ -29,40 +32,7 @@
   border-color: #3f3f46;
 }
 
-/* Clean Top Metadata Bar */
-.edu-card-topbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.edu-status-badge {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #c49a6c;
-  background: rgba(139, 90, 43, 0.15);
-  border: 1px solid rgba(196, 154, 108, 0.35);
-  padding: 0.3rem 0.65rem;
-  border-radius: 2px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.edu-period-badge {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #e4e4e7;
-  background: #18181b;
-  border: 1px solid #3f3f46;
-  padding: 0.3rem 0.65rem;
-  border-radius: 2px;
-}
-
-/* University Logo Container */
+/* University Logo Container (Top of Card) */
 .edu-logo-wrapper {
   background: #ffffff;
   border: 1px solid #e4e4e7;
@@ -71,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.25rem;
 }
 
 .edu-logo-img {
@@ -79,6 +49,33 @@
   max-width: 100%;
   object-fit: contain;
   display: block;
+}
+
+/* Clean Metadata Bar (Below Logo, No Boxes) */
+.edu-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.edu-meta-status {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c49a6c; /* Warm coffee crema */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.edu-meta-period {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffffff; /* Crisp white */
+  letter-spacing: 0.03em;
 }
 
 /* Degree & Major - Clear, Uncompressed Typography */
@@ -115,28 +112,29 @@
 .edu-inst-main {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #f4f4f5;
+  color: #ffffff;
   line-height: 1.4;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 
 .edu-inst-sub {
-  font-size: 0.88rem;
-  color: #d4d4d8;
-  margin-bottom: 0.2rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #e4e4e7;
+  margin-bottom: 0.25rem;
 }
 
 .edu-inst-note {
-  font-size: 0.82rem;
-  color: #a1a1aa;
-  line-height: 1.35;
+  font-size: 0.86rem;
+  color: #d4d4d8;
+  line-height: 1.45;
 }
 
-/* Natural Overview Paragraph */
+/* Natural Overview Paragraph - High Clarity */
 .edu-overview {
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: #a1a1aa;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #e4e4e7;
   margin-bottom: 1.6rem;
 }
 
@@ -203,15 +201,15 @@
 
 .edu-partner-name {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #f4f4f5;
+  color: #ffffff;
 }
 
 .edu-partner-role {
-  font-size: 0.72rem;
-  color: #a1a1aa;
-  line-height: 1.35;
+  font-size: 0.78rem;
+  color: #d4d4d8;
+  line-height: 1.4;
 }
 
 /* Responsive adjustments */
