@@ -9,7 +9,7 @@ const getSystemPrompt = () => {
   return `You are the personal AI agent of Sayandh Raj, an elite AI/ML Engineer & Data Architect. 
 You speak in a concise, technical, and slightly robotic terminal style. 
 Do not use emojis. Sayandh's skills include Python, SQL, R, ML, NLP, GenAI, LangChain.
-Certifications: Google Advanced Data Analytics, IBM Data Science, Coursera AI Engineering.
+Certifications: 23 verified Credly badges including IBM AI & ML Graduate, Google Advanced Data Analytics, IBM Data Science Professional. Profile: credly.com/users/sayandhraj.
 Experience: IBM, TCS iON, Networkers Home, AISECT Learn, The Developers Arena (Data Science and Analytics).
 Notable Projects: KILL SWITCH (Smoking Community Platform), Unsullied Code (Offline-First Mobile IDE), ATS Resume Builder, RAG Document Chatbot.
 
@@ -165,7 +165,7 @@ const UNIXTerminal = () => {
     }
     // Help
     else if (includes(["help", "commands", "menu", "options", "what can you do"])) {
-      replyText = "AVAILABLE COMMANDS: `whois` | `skills` | `projects` | `contact` | `experience` | `certifications` | `education` | `date` | `time` | `tip` | `game` | `toggle_audio` | Or ask me anything.";
+      replyText = "AVAILABLE COMMANDS: `whois` | `skills` | `projects` | `contact` | `experience` | `certifications` | `badges` | `credly` | `education` | `date` | `time` | `tip` | `game` | `toggle_audio` | Or ask me anything.";
     }
     // Who is / About
     else if (includes(["whois", "who is", "about", "bio", "tell me about", "who are you", "whose portfolio", "who r u"])) {
@@ -194,9 +194,9 @@ const UNIXTerminal = () => {
     else if (includes(["experience", "intern", "job", "company", "deployment"])) {
       replyText = "IBM (Applied AI Programs) | TCS iON (Cloud Big Data) | Networkers Home (AI Engineering) | AISECT Learn (Data Science) | The Developers Arena (Data Science and Analytics).";
     }
-    // Certifications
-    else if (includes(["cert", "certification", "verified", "credential", "course"])) {
-      replyText = "Google Advanced Data Analytics | IBM Data Science Professional | Coursera AI Engineering | TCS iON Industry Project.";
+    // Certifications & Badges
+    else if (includes(["cert", "certification", "verified", "credential", "course", "badge", "credly", "achievement"])) {
+      replyText = "23 VERIFIED CREDLY BADGES: IBM AI & ML Graduate | Google Advanced Data Analytics | IBM Data Science Professional | Deep Learning & RL | Python ML. View all in Section 04 or at credly.com/users/sayandhraj";
     }
     // Education
     else if (includes(["education", "college", "university", "degree", "study", "school", "bca", "msc"])) {
