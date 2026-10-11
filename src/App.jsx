@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroTerminal from './components/HeroTerminal';
 import TheArchitect from './components/TheArchitect';
 import Deployments from './components/Deployments';
+import Education from './components/Education';
 import TheArsenal from './components/TheArsenal';
 import EngineComponents from './components/EngineComponents';
 import Verifications from './components/Verifications';
@@ -24,6 +25,7 @@ function App() {
       <HeroTerminal />
       <TheArchitect />
       <Deployments />
+      <Education />
       <TheArsenal />
       <EngineComponents />
       <Verifications />

@@ -16,7 +16,10 @@ Style: Concise, technical, hacker/CLI. NO markdown bold headers (**), NO unneces
 You can answer ANY question (general knowledge, science, computing, "gold", coding, algorithms, explanations) as well as questions regarding Sayandh Raj.
 
 Sayandh Raj Facts:
-- AI/ML Engineer & Data Architect. M.Sc. CS (AI Spec) in progress, BCA AI & Data Science (CGPA: 8.59/10).
+- AI/ML Engineer & Data Architect.
+- Academic Background:
+  * M.Sc. in Computer Science (Artificial Intelligence Specialization), Kerala University of Digital Sciences, Innovation and Technology (Digital University of Kerala / DUK, formerly IIITM-K), Trivandrum, Kerala (2026 – 2028, Pursuing).
+  * BCA in Artificial Intelligence & Data Science, Yenepoya (Deemed to be University), Bengaluru Off-Campus, Karnataka (Main University: Mangalore, Karnataka, India) (2023 – 2026, CGPA: 8.59/10).
 - Stack: Python, PyTorch, TensorFlow, SQL, R, Pandas, NumPy, Scikit-Learn, Power BI, FastAPI, LangChain, Hugging Face, Docker.
 - 23 Credly Badges: IBM AI & ML Graduate, Google Advanced Data Analytics, IBM Data Science Professional (credly.com/users/sayandhraj).
 - Deployments:
@@ -220,7 +223,7 @@ const UNIXTerminal = () => {
   const initialGreeting = `sayandh-terminal v2.4 (x86_64-node)
 system online. spurce.ai neural backend linked.
 
-directives: whois  skills  projects  experience  badges  contact  game  clear
+directives: whois  skills  education  projects  experience  badges  contact  game  clear
 or enter any query to search.`;
 
   const [messages, setMessages] = useState([
@@ -316,7 +319,7 @@ or enter any query to search.`;
       setMessages([
         {
           sender: 'system',
-          text: `buffer cleared.\ndirectives: whois  skills  projects  experience  badges  contact  clear`,
+          text: `buffer cleared.\ndirectives: whois  skills  education  projects  experience  badges  contact  clear`,
           typing: false
         }
       ]);
@@ -404,8 +407,12 @@ clear      - clear terminal buffer`;
     else if (matchesAny(['whois', 'who is', 'about', 'bio', 'who are you', 'tell me about', 'whose portfolio', 'profile'])) {
       replyText = `[IDENTITY: SAYANDH RAJ]
 role       : AI/ML Engineer & Data Architect
-education  : M.Sc. Computer Science (AI Specialization) - in progress
-             BCA in AI & Data Science - Yenepoya University (CGPA: 8.59/10)
+education  : 1. M.Sc. Computer Science (AI Specialization) [2026-2028, Pursuing]
+                Kerala University of Digital Sciences, Innovation and Technology
+                (Digital University of Kerala / DUK, formerly IIITM-K), Trivandrum
+             2. BCA in AI & Data Science [2023-2026, CGPA: 8.59/10]
+                Yenepoya (Deemed to be University), Bengaluru Off-Campus
+                (Main University: Mangalore, Karnataka, India)
 domain     : Deep Learning, Neural Networks, Generative AI (LLMs/RAG),
              NLP, Computer Vision, Scalable Data Pipelines
 github     : https://github.com/sayandhsr
@@ -475,11 +482,21 @@ registry: https://credly.com/users/sayandhraj`;
     // EDUCATION
     else if (matchesAny(['education', 'college', 'university', 'degree', 'study', 'school', 'bca', 'msc', 'academics'])) {
       replyText = `[ACADEMIC CREDENTIALS]
-- Master of Science (M.Sc.) in Computer Science (AI Specialization)
-  status: in progress
-- Bachelor of Computer Applications (BCA) in AI & Data Science
-  institution : Yenepoya University
-  cgpa        : 8.59 / 10.00`;
+1. Master of Science (M.Sc.) in Computer Science (Artificial Intelligence)
+   period      : 2026 – 2028 [Pursuing / Active Scholar]
+   institution : Kerala University of Digital Sciences, Innovation and Technology
+                 (Digital University of Kerala / DUK)
+   former name : Indian Institute of Information Technology and Management - Kerala (IIITM-K)
+   campus      : Trivandrum (Thiruvananthapuram), Kerala, India
+   focus       : Deep Learning, Neural Architectures, Autonomous AI Systems
+
+2. Bachelor of Computer Applications (BCA) in AI & Data Science
+   period      : 2023 – 2026
+   institution : Yenepoya (Deemed to be University)
+   campus      : Bengaluru Off-Campus, Karnataka
+   main campus : Mangalore, Karnataka, India
+   cgpa        : 8.59 / 10.00
+   focus       : Machine Learning, Statistical Modeling, Data Pipelines`;
     }
     // CONTACT
     else if (matchesAny(['contact', 'phone', 'email', 'mail', 'reach', 'call', 'number', 'linkedin', 'github', 'kaggle'])) {
