@@ -49,10 +49,11 @@ export default class PokemonGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.loadGame();
+    this.inTitle = true;
+    this.loadGame(true);
   }
 
-  loadGame() {
+  loadGame(keepTitle = false) {
     const saved = this.ctx.storage.getSaveSlot('pokemon', 0);
     if (saved && saved.party && saved.party.length > 0) {
       this.party = saved.party;
@@ -63,7 +64,7 @@ export default class PokemonGame {
       // Starter creature
       this.party = [{ ...CREATURES[1], level: 5, exp: 0 }]; // EMBERPUP starter
     }
-    this.reset();
+    this.reset(keepTitle);
   }
 
   saveGame() {
@@ -76,7 +77,7 @@ export default class PokemonGame {
     this.ctx.audio.playSelect();
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.state = 'OVERWORLD';
     this.area = 0;
     this.gx = 5;
@@ -85,7 +86,9 @@ export default class PokemonGame {
     this.battle = null;
     this.dialogue = null;
     this.gameOver = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
   }
 
   pause() { this.paused = true; }
@@ -200,7 +203,9 @@ export default class PokemonGame {
       turn: 'PLAYER',
       animTimer: 0
     };
-    this.battleText = `A WILD ${this.battle.wild.name} APPEARED!`;
+    this.battleWaitTimer = 0;
+    this.battlePendingState = null;
+    this.battleText = `A WILD ${this.battle.wild.name}\nAPPEARED!`;
     this.ctx.audio.playLaser();
     this.ctx.renderer.flash(4, 3);
   }
@@ -208,6 +213,23 @@ export default class PokemonGame {
   updateBattle(dt, input) {
     if (this.battle.animTimer > 0) {
       this.battle.animTimer -= dt;
+      return;
+    }
+
+    // Pending deterministic state transitions (faint, captured, run away)
+    if (this.battleWaitTimer > 0) {
+      this.battleWaitTimer -= dt;
+      if (this.battleWaitTimer <= 0) {
+        if (this.battlePendingState === 'OVERWORLD') {
+          this.state = 'OVERWORLD';
+          this.battle = null;
+          this.saveGame();
+        } else if (this.battlePendingState === 'GAMEOVER') {
+          this.gameOver = true;
+          this.battle = null;
+        }
+        this.battlePendingState = null;
+      }
       return;
     }
 
@@ -240,7 +262,7 @@ export default class PokemonGame {
 
         if (wild.hp <= 0) {
           wild.hp = 0;
-          this.battleText = `${wild.name} FAINTED! WON BATTLE!`;
+          this.battleText = `${wild.name} FAINTED!\nWON 250 PTS!`;
           this.score += 250;
           activeParty.exp += 25;
           if (activeParty.exp >= activeParty.level * 30) {
@@ -248,28 +270,25 @@ export default class PokemonGame {
             activeParty.maxHp += 4;
             activeParty.atk += 2;
             activeParty.hp = activeParty.maxHp;
-            this.battleText = `${activeParty.name} GREW TO LV ${activeParty.level}!`;
+            this.battleText = `${activeParty.name} GREW TO\nLEVEL ${activeParty.level}!`;
           }
           this.ctx.audio.playPowerup();
-          setTimeout(() => {
-            this.state = 'OVERWORLD';
-            this.saveGame();
-          }, 1200);
+          this.battleWaitTimer = 1.2;
+          this.battlePendingState = 'OVERWORLD';
           return;
         }
 
         // Enemy turn
         const enemyDmg = Math.max(1, Math.floor(wild.atk - activeParty.def / 2));
         activeParty.hp -= enemyDmg;
-        this.battleText = `${wild.name} ATTACKED FOR ${enemyDmg} DMG!`;
+        this.battleText = `${wild.name} ATTACKED!\nDEALT ${enemyDmg} DMG!`;
 
         if (activeParty.hp <= 0) {
           activeParty.hp = 0;
-          this.battleText = `${activeParty.name} FAINTED! OUT OF CREATURES!`;
+          this.battleText = `${activeParty.name} FAINTED!\nOUT OF CREATURES!`;
           this.ctx.audio.playGameOver();
-          setTimeout(() => {
-            this.gameOver = true;
-          }, 1200);
+          this.battleWaitTimer = 1.2;
+          this.battlePendingState = 'GAMEOVER';
         }
       } else if (this.battleMenuIdx === 1) {
         // 2. CATCH (Pokéball)
@@ -280,14 +299,12 @@ export default class PokemonGame {
           if (Math.random() < catchChance) {
             this.party.push(wild);
             this.score += 500;
-            this.battleText = `GOTCHA! ${wild.name} WAS CAUGHT!`;
+            this.battleText = `GOTCHA!\n${wild.name} CAUGHT!`;
             this.ctx.audio.playPowerup();
-            this.saveGame();
-            setTimeout(() => {
-              this.state = 'OVERWORLD';
-            }, 1200);
+            this.battleWaitTimer = 1.2;
+            this.battlePendingState = 'OVERWORLD';
           } else {
-            this.battleText = `OH NO! ${wild.name} BROKE FREE!`;
+            this.battleText = `OH NO!\n${wild.name} BROKE FREE!`;
           }
         } else {
           this.battleText = 'OUT OF POKÉBALLS!';
@@ -297,7 +314,7 @@ export default class PokemonGame {
         if (this.potions > 0) {
           this.potions--;
           activeParty.hp = Math.min(activeParty.maxHp, activeParty.hp + 15);
-          this.battleText = `USED POTION! RECOVERED HP.`;
+          this.battleText = 'USED POTION!\nRECOVERED 15 HP.';
           this.ctx.audio.playPowerup();
         } else {
           this.battleText = 'NO POTIONS LEFT!';
@@ -306,9 +323,8 @@ export default class PokemonGame {
         // 4. RUN
         this.battleText = 'GOT AWAY SAFELY!';
         this.ctx.audio.playSelect();
-        setTimeout(() => {
-          this.state = 'OVERWORLD';
-        }, 600);
+        this.battleWaitTimer = 0.8;
+        this.battlePendingState = 'OVERWORLD';
       }
     }
   }
@@ -322,30 +338,44 @@ export default class PokemonGame {
       this.renderBattle(r);
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('POKÉMON', 40, 0, 1);
-      r.textCentered('RED & BLUE', 52, 1, 1);
-      r.textCentered('PRESS A OR START', 76, 0, 1);
-      r.textCentered('EXPLORE & CAPTURE!', 94, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('POKÉMON', 22, 0, 1);
+      r.textCentered('RED & BLUE', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('ARROWS/WASD: WALK GRID', 16, 58, 0);
+      r.text('A / Z : TALK / CHOOSE / FIGHT', 16, 70, 0);
+      r.text('B / X : CANCEL / BACK / RUN', 16, 82, 0);
+      r.text('EXPLORE TALL GRASS FOR MONS', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('BLACKED OUT!', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('BLACKED OUT!', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('VISIT POKÉCENTER', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 
@@ -354,7 +384,7 @@ export default class PokemonGame {
     r.fillRect(0, 0, 160, 14, 1);
     const areaNames = ['PALLET TOWN', 'ROUTE 1', 'VIRIDIAN CITY'];
     r.text(areaNames[this.area], 4, 4, 3);
-    r.text(`BALLS:${this.balls}`, 95, 4, 3);
+    r.text(`BALLS:${this.balls}`, 92, 4, 3);
     r.text(`P:${this.party.length}`, 142, 4, 3);
 
     // Map graphics
@@ -384,13 +414,15 @@ export default class PokemonGame {
     const py = this.gy * 11;
     r.fillRect(px, py, 8, 12, 0);
     r.fillRect(px + 2, py + 2, 4, 3, 1); // cap visor
+    r.fillRect(px + 1, py + 5, 6, 4, 2); // shirt
 
-    // Dialogue Overlay
+    // Dialogue Overlay - Clean, distinct box with multi-line support
     if (this.dialogue) {
-      r.fillRect(10, 85, 140, 50, 3);
-      r.strokeRect(10, 85, 140, 50, 0);
-      r.text(this.dialogue, 15, 95, 0);
-      r.text('▼', 138, 124, 0);
+      r.fillRect(8, 84, 144, 52, 3);
+      r.strokeRect(8, 84, 144, 52, 0);
+      r.strokeRect(10, 86, 140, 48, 1);
+      r.text(this.dialogue, 14, 92, 0);
+      r.text('▼', 138, 122, 0);
     }
   }
 
@@ -398,45 +430,79 @@ export default class PokemonGame {
     const { wild, activeParty } = this.battle;
 
     // Wild Creature (Top Right)
-    r.text(wild.name, 80, 18, 0);
-    r.text(`:L${wild.level}`, 130, 18, 1);
-    r.text(`HP: ${wild.hp}/${wild.maxHp}`, 80, 28, 0);
-    r.strokeRect(80, 36, 60, 4, 0);
-    r.fillRect(81, 37, Math.max(1, Math.floor((wild.hp / wild.maxHp) * 58)), 2, 1);
-    // Wild sprite outline
-    r.circle(38, 45, 14, 0, false);
-    r.fillRect(32, 40, 12, 10, 1);
+    r.text(wild.name, 76, 16, 0);
+    r.text(`:L${wild.level}`, 134, 16, 1);
+    r.text(`HP:${wild.hp}/${wild.maxHp}`, 76, 26, 0);
+    r.strokeRect(76, 34, 68, 5, 0);
+    const wildHpW = Math.max(0, Math.floor((wild.hp / wild.maxHp) * 66));
+    r.fillRect(77, 35, wildHpW, 3, 1);
+
+    // Wild front sprite (procedural pixel art)
+    this.renderFrontSprite(r, wild, 36, 44);
 
     // Player Creature (Bottom Left)
-    r.text(activeParty.name, 10, 68, 0);
-    r.text(`:L${activeParty.level}`, 65, 68, 1);
-    r.text(`HP: ${activeParty.hp}/${activeParty.maxHp}`, 10, 78, 0);
-    r.strokeRect(10, 86, 60, 4, 0);
-    r.fillRect(11, 87, Math.max(1, Math.floor((activeParty.hp / activeParty.maxHp) * 58)), 2, 0);
-    // Back sprite outline
-    r.circle(125, 80, 16, 0, false);
-    r.fillRect(118, 74, 14, 12, 1);
+    r.text(activeParty.name, 10, 64, 0);
+    r.text(`:L${activeParty.level}`, 68, 64, 1);
+    r.text(`HP:${activeParty.hp}/${activeParty.maxHp}`, 10, 74, 0);
+    r.strokeRect(10, 82, 68, 5, 0);
+    const partyHpW = Math.max(0, Math.floor((activeParty.hp / activeParty.maxHp) * 66));
+    r.fillRect(11, 83, partyHpW, 3, 0);
+
+    // Player back sprite (Trainer back silhouette)
+    this.renderBackSprite(r, 120, 76);
 
     // Battle Text Box / Menu
-    r.strokeRect(0, 96, 160, 48, 0);
-    r.fillRect(0, 96, 160, 48, 3);
+    r.fillRect(0, 94, 160, 50, 3);
+    r.strokeRect(0, 94, 160, 50, 0);
+    r.strokeRect(2, 96, 156, 46, 1);
 
-    // Menu options: 2x2 grid
-    r.text(this.battleText || 'WHAT WILL RED DO?', 8, 102, 0);
+    if (this.battleWaitTimer > 0) {
+      // Event status message (won, faint, catch, run)
+      r.text(this.battleText, 12, 106, 0);
+      r.text('▼', 144, 132, 0);
+    } else {
+      // Menu options: 2x2 grid
+      r.text('WHAT WILL RED DO?', 10, 102, 0);
 
-    const options = ['FIGHT', 'CATCH', 'ITEM', 'RUN'];
-    const coords = [
-      { x: 20, y: 118 }, { x: 90, y: 118 },
-      { x: 20, y: 130 }, { x: 90, y: 130 }
-    ];
+      const options = ['FIGHT', 'CATCH', 'ITEM', 'RUN'];
+      const coords = [
+        { x: 24, y: 118 }, { x: 92, y: 118 },
+        { x: 24, y: 130 }, { x: 92, y: 130 }
+      ];
 
-    for (let i = 0; i < 4; i++) {
-      const opt = options[i];
-      const pos = coords[i];
-      if (this.battleMenuIdx === i) {
-        r.text('▶', pos.x - 8, pos.y, 0);
+      for (let i = 0; i < 4; i++) {
+        const opt = options[i];
+        const pos = coords[i];
+        if (this.battleMenuIdx === i) {
+          r.text('▶', pos.x - 8, pos.y, 0);
+        }
+        r.text(opt, pos.x, pos.y, 0);
       }
-      r.text(opt, pos.x, pos.y, 0);
     }
+  }
+
+  renderFrontSprite(r, monster, cx, cy) {
+    // Detailed pixel monster sprite
+    r.fillRect(cx - 10, cy - 8, 20, 16, 1);
+    r.strokeRect(cx - 10, cy - 8, 20, 16, 0);
+    // Eyes
+    r.fillRect(cx - 6, cy - 4, 3, 3, 0);
+    r.fillRect(cx + 3, cy - 4, 3, 3, 0);
+    // Ears/Horns
+    r.fillRect(cx - 8, cy - 12, 4, 4, 0);
+    r.fillRect(cx + 4, cy - 12, 4, 4, 0);
+    // Snout / Teeth
+    r.fillRect(cx - 2, cy + 2, 4, 2, 0);
+  }
+
+  renderBackSprite(r, cx, cy) {
+    // Red trainer back sprite
+    r.fillRect(cx - 8, cy - 6, 16, 16, 0);
+    // Cap
+    r.fillRect(cx - 6, cy - 10, 12, 5, 1);
+    // Cap bill
+    r.fillRect(cx - 9, cy - 7, 3, 2, 1);
+    // Collar & backpack strap
+    r.fillRect(cx - 4, cy - 2, 8, 4, 2);
   }
 }

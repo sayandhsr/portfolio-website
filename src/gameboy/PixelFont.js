@@ -62,6 +62,9 @@ export const GLYPHS = {
   '$': ['01110', '11000', '01110', '00011', '01110'],
   '#': ['01010', '11111', '01010', '11111', '01010'],
   '&': ['0100', '1010', '0100', '1010', '0101'],
+  '|': ['1', '1', '1', '1', '1'],
+  '~': ['0110', '1001', '0000', '0000', '0000'],
+  'É': ['1111', '1000', '1110', '1000', '1111'],
   '®': ['01110', '11011', '11101', '11011', '01110'],
   '™': ['11101', '01011', '01011', '01011', '00000'],
   '▶': ['1000', '1100', '1110', '1100', '1000'],
@@ -78,13 +81,13 @@ export const GLYPHS = {
 export const drawPixelText = (ctx, text, x, y, color = '#0f380f', scale = 1) => {
   const upper = String(text).toUpperCase();
   let cursorX = Math.floor(x);
-  const startY = Math.floor(y);
+  let cursorY = Math.floor(y);
 
   for (let i = 0; i < upper.length; i++) {
     const ch = upper[i];
     if (ch === '\n') {
       cursorX = Math.floor(x);
-      y += 7 * scale;
+      cursorY += 8 * scale;
       continue;
     }
 
@@ -98,7 +101,7 @@ export const drawPixelText = (ctx, text, x, y, color = '#0f380f', scale = 1) => 
         if (row[c] === '1') {
           ctx.fillRect(
             cursorX + c * scale,
-            startY + r * scale,
+            cursorY + r * scale,
             scale,
             scale
           );
@@ -112,12 +115,17 @@ export const drawPixelText = (ctx, text, x, y, color = '#0f380f', scale = 1) => 
 };
 
 export const measurePixelText = (text, scale = 1) => {
-  const upper = String(text).toUpperCase();
-  let totalWidth = 0;
-  for (let i = 0; i < upper.length; i++) {
-    const ch = upper[i];
-    const glyph = GLYPHS[ch] || GLYPHS['?'];
-    totalWidth += (glyph[0].length + 1) * scale;
+  const lines = String(text).toUpperCase().split('\n');
+  let maxWidth = 0;
+  for (const line of lines) {
+    let lineWidth = 0;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      const glyph = GLYPHS[ch] || GLYPHS['?'];
+      lineWidth += (glyph[0].length + 1) * scale;
+    }
+    if (lineWidth > 0) lineWidth -= 1 * scale;
+    if (lineWidth > maxWidth) maxWidth = lineWidth;
   }
-  return Math.max(0, totalWidth - 1 * scale);
+  return maxWidth;
 };

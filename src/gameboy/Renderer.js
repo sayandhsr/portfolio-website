@@ -131,9 +131,14 @@ export class Renderer {
   }
 
   textCentered(str, y, shade = 0, scale = 1) {
-    const w = measurePixelText(str, scale);
-    const x = Math.floor((this.width - w) / 2);
-    return drawPixelText(this.ctx, str, x, y, this.getColor(shade), scale);
+    const lines = String(str).split('\n');
+    let currentY = Math.floor(y);
+    for (const line of lines) {
+      const w = measurePixelText(line, scale);
+      const x = Math.floor((this.width - w) / 2);
+      drawPixelText(this.ctx, line, x, currentY, this.getColor(shade), scale);
+      currentY += 8 * scale;
+    }
   }
 
   measureText(str, scale = 1) {

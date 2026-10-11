@@ -34,10 +34,11 @@ export default class MetroidGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.energy = 99;
     this.missiles = 10;
     this.metroidsLeft = 4;
@@ -46,7 +47,9 @@ export default class MetroidGame {
     this.weapon = 'beam';
     this.gameOver = false;
     this.gameWon = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
 
     this.px = 24;
     this.py = 100;
@@ -257,12 +260,12 @@ export default class MetroidGame {
     r.clear(3);
     const cx = Math.floor(this.cameraX);
 
-    // Top HUD
+    // Top HUD - strictly aligned within 160px
     r.fillRect(0, 0, 160, 14, 1);
     r.text(`EN:${this.energy}`, 4, 4, 3);
-    r.text(`M:${this.missiles}`, 54, 4, 3);
-    r.text(`LEFT:${this.metroidsLeft}`, 92, 4, 3);
-    r.text(`${this.weapon.toUpperCase()}`, 135, 4, 3);
+    r.text(`M:${this.missiles}`, 50, 4, 3);
+    r.text(`LEFT:${this.metroidsLeft}`, 84, 4, 3);
+    r.text(this.weapon === 'beam' ? 'BEAM' : 'MISL', 134, 4, 3);
 
     // Cavern rocky floor
     r.fillRect(0, 120, 160, 24, 0);
@@ -326,40 +329,56 @@ export default class MetroidGame {
       }
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('METROID II', 40, 0, 1);
-      r.textCentered('RETURN OF SAMUS', 52, 1, 1);
-      r.textCentered('PRESS A OR START', 76, 0, 1);
-      r.textCentered('SELECT: MISSILES', 94, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('METROID II', 22, 0, 1);
+      r.textCentered('RETURN OF SAMUS', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('◄ / ►: RUN | ▲: AIM UP', 16, 58, 0);
+      r.text('A / Z: JUMP OVER FOES', 16, 70, 0);
+      r.text('B / X: FIRE WEAPON', 16, 82, 0);
+      r.text('SELECT / SHIFT: MISSILES', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('SUIT COMPROMISED', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('SUIT COMPROMISED', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('SR388 CAVERNS CLAIMED YOU', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Victory Overlay
     if (this.gameWon) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('MISSION COMPLETE', 48, 0, 1);
-      r.textCentered('SR388 SECURED', 64, 1, 1);
-      r.textCentered(`FINAL SCORE: ${this.score}`, 80, 0, 1);
-      r.textCentered('PRESS A TO RESTART', 96, 1, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('MISSION COMPLETE', 46, 0, 1);
+      r.textCentered('SR388 SECURED!', 62, 1, 1);
+      r.textCentered(`FINAL SCORE: ${this.score}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RESTART', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.gameWon && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

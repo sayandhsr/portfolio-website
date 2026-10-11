@@ -31,17 +31,20 @@ export default class CastlevaniaGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.score = 0;
     this.hearts = 10;
     this.hp = 16;
     this.stage = 1;
     this.gameOver = false;
     this.gameWon = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.loadStage(1);
   }
 
@@ -139,22 +142,23 @@ export default class CastlevaniaGame {
       this.ctx.audio.playJump();
     }
 
-    // Whip Attack (X or B button)
-    if (input.justPressed(BUTTONS.B) && this.whipTimer <= 0) {
+    // Attack controls
+    if (input.isDown(BUTTONS.UP) && input.justPressed(BUTTONS.B)) {
+      // Sub-weapon throwing (Up + B)
+      if (this.hearts > 0) {
+        this.hearts--;
+        this.subWeapons.push({
+          x: this.px + (this.facingRight ? 10 : -10),
+          y: this.py + 4,
+          vx: (this.facingRight ? 1 : -1) * 150
+        });
+        this.ctx.audio.playSelect();
+      }
+    } else if (input.justPressed(BUTTONS.B) && this.whipTimer <= 0) {
+      // Whip Attack (B button)
       this.whipTimer = 0.25;
       this.ctx.audio.playLaser();
       this.checkWhipCollision();
-    }
-
-    // Sub-weapon throwing (Up + B)
-    if (input.isDown(BUTTONS.UP) && input.justPressed(BUTTONS.B) && this.hearts > 0) {
-      this.hearts--;
-      this.subWeapons.push({
-        x: this.px + (this.facingRight ? 10 : -10),
-        y: this.py + 4,
-        vx: (this.facingRight ? 1 : -1) * 150
-      });
-      this.ctx.audio.playSelect();
     }
 
     // Gravity
@@ -332,47 +336,69 @@ export default class CastlevaniaGame {
       r.fillRect(px, Math.floor(this.py), 8, 16, 0);
       r.fillRect(px + (this.facingRight ? 4 : 0), Math.floor(this.py) + 2, 4, 4, 1);
 
-      // Whip swing
+      // Whip swing - properly drawn in both facing directions
       if (this.whipTimer > 0) {
-        const wx = this.facingRight ? px + 8 : px - 20;
-        r.line(px + (this.facingRight ? 8 : 0), Math.floor(this.py) + 6, wx + 20, Math.floor(this.py) + 6, 0);
+        const whipY = Math.floor(this.py) + 6;
+        if (this.facingRight) {
+          r.line(px + 8, whipY, px + 26, whipY, 0);
+          r.fillRect(px + 8, whipY - 1, 18, 2, 1);
+        } else {
+          r.line(px - 18, whipY, px, whipY, 0);
+          r.fillRect(px - 18, whipY - 1, 18, 2, 1);
+        }
       }
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('CASTLEVANIA', 40, 0, 1);
-      r.textCentered('RONDO OF BLOOD', 52, 1, 1);
-      r.textCentered('PRESS A OR START', 76, 0, 1);
-      r.textCentered('B: WHIP | UP+B: SUB', 94, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('CASTLEVANIA', 22, 0, 1);
+      r.textCentered('RONDO OF BLOOD', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('◄ / ►: WALK GOTHIC HALLS', 16, 58, 0);
+      r.text('A / Z: JUMP OVER CREATURES', 16, 70, 0);
+      r.text('B / X: WHIP STRIKE', 16, 82, 0);
+      r.text('▲ + B: SUB-WEAPON (HEARTS)', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('THE CASTLE PERSISTS', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Victory Overlay
     if (this.gameWon) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('DRACULA SLAIN!', 48, 0, 1);
-      r.textCentered('CASTLE DESTROYED', 64, 1, 1);
-      r.textCentered(`FINAL SCORE: ${this.score}`, 80, 0, 1);
-      r.textCentered('PRESS A TO RESTART', 96, 1, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('DRACULA SLAIN!', 46, 0, 1);
+      r.textCentered('CASTLE DESTROYED!', 62, 1, 1);
+      r.textCentered(`FINAL SCORE: ${this.score}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RESTART', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.gameWon && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

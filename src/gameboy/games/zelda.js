@@ -31,10 +31,11 @@ export default class ZeldaGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.hp = 6;
     this.maxHp = 6;
     this.rupees = 0;
@@ -49,7 +50,9 @@ export default class ZeldaGame {
     this.dialogue = null;
     this.gameOver = false;
     this.gameWon = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
 
     // Build screens
     this.screens = {
@@ -153,6 +156,7 @@ export default class ZeldaGame {
         } else {
           if (this.screenX === 1 && this.screens[2].doorLocked && this.hasKey) {
             this.screens[2].doorLocked = false;
+            this.hasKey = false; // Tail key used to unlock Tail Cave
             this.ctx.audio.playPowerup();
           }
           this.screenX++;
@@ -185,18 +189,54 @@ export default class ZeldaGame {
       this.ctx.audio.playSelect();
     }
 
-    // Update Boomerang
+    const curScn = this.screens[this.screenX];
+
+    // Update Boomerang with collision detection
     if (this.boomerang) {
       this.boomerang.x += this.boomerang.vx * dt;
       this.boomerang.y += this.boomerang.vy * dt;
       this.boomerang.dist += 160 * dt;
-      if (this.boomerang.dist > 60) {
+
+      // Check collision with screen enemies
+      if (curScn.enemies) {
+        for (const e of curScn.enemies) {
+          if (e.alive && Math.hypot(this.boomerang.x - e.x, this.boomerang.y - e.y) < 12) {
+            e.hp--;
+            this.ctx.audio.playHit();
+            this.boomerang = null;
+            if (e.hp <= 0) {
+              e.alive = false;
+              this.rupees += 5;
+              this.score += 100;
+              this.ctx.audio.playCoin();
+            }
+            break;
+          }
+        }
+      }
+
+      // Check collision with dungeon boss
+      if (this.boomerang && this.screenX === 2 && curScn.boss && curScn.boss.alive) {
+        const b = curScn.boss;
+        if (Math.hypot(this.boomerang.x - b.x, this.boomerang.y - b.y) < 16) {
+          b.hp--;
+          this.ctx.audio.playHit();
+          this.boomerang = null;
+          if (b.hp <= 0) {
+            b.alive = false;
+            this.gameWon = true;
+            this.score += 1500;
+            this.ctx.audio.playPowerup();
+          }
+        }
+      }
+
+      if (this.boomerang && this.boomerang.dist > 75) {
         this.boomerang = null;
       }
     }
 
     // Check Chest & Signs & NPC
-    const curScn = this.screens[this.screenX];
     if (curScn.chest && !curScn.chest.opened) {
       if (Math.hypot(this.px - curScn.chest.x, this.py - curScn.chest.y) < 14) {
         curScn.chest.opened = true;
@@ -383,40 +423,56 @@ export default class ZeldaGame {
       r.text('▼', 138, 124, 0);
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('ZELDA', 40, 0, 1);
-      r.textCentered("LINK'S AWAKENING", 52, 1, 1);
-      r.textCentered('PRESS A OR START', 76, 0, 1);
-      r.textCentered('A: SWORD | B: BOOMERANG', 94, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('THE LEGEND OF ZELDA', 22, 0, 1);
+      r.textCentered("LINK'S AWAKENING", 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('ARROWS/WASD: MOVE LINK', 16, 58, 0);
+      r.text('A / Z: SWORD SLASH / TALK', 16, 70, 0);
+      r.text('B / X: THROW BOOMERANG', 16, 82, 0);
+      r.text('FIND TAIL KEY ON BEACH', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('KOHOLINT FORGIVES YOU', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Victory Overlay
     if (this.gameWon) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('INSTRUMENT AWAKENED', 48, 0, 1);
-      r.textCentered('TAIL CAVE CLEARED!', 64, 1, 1);
-      r.textCentered(`FINAL SCORE: ${this.score}`, 80, 0, 1);
-      r.textCentered('PRESS A TO RESTART', 96, 1, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('INSTRUMENT AWAKENED', 46, 0, 1);
+      r.textCentered('TAIL CAVE CLEARED!', 62, 1, 1);
+      r.textCentered(`FINAL SCORE: ${this.score}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RESTART', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.gameWon && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

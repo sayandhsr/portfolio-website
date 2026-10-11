@@ -35,10 +35,11 @@ export default class FinalFantasyGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.loadGame();
+    this.inTitle = true;
+    this.loadGame(true);
   }
 
-  loadGame() {
+  loadGame(keepTitle = false) {
     const saved = this.ctx.storage.getSaveSlot('finalfantasy', 0);
     if (saved) {
       this.hp = saved.hp || 20;
@@ -48,7 +49,7 @@ export default class FinalFantasyGame {
       this.gold = saved.gold || 50;
       this.potions = saved.potions || 2;
     }
-    this.reset();
+    this.reset(keepTitle);
   }
 
   saveGame() {
@@ -63,7 +64,7 @@ export default class FinalFantasyGame {
     this.ctx.audio.playSelect();
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.location = 'TOWN';
     this.px = 40;
     this.py = 60;
@@ -73,7 +74,9 @@ export default class FinalFantasyGame {
     this.dialogue = null;
     this.gameOver = false;
     this.gameWon = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.loadLocation('TOWN');
   }
 
@@ -211,7 +214,7 @@ export default class FinalFantasyGame {
     if (this.location === 'TOWN') {
       // Quest Giver at x=30, y=40
       if (Math.hypot(this.px - 30, this.py - 40) < 16 && input.justPressed(BUTTONS.A)) {
-        this.dialogue = 'QUEST GIVER:\nSLAY THE DRAGON IN THE CAVE!\nPROCEED EAST TO EXPLORE.';
+        this.dialogue = 'QUEST GIVER:\nSLAY CAVE DRAGON!\nPROCEED EAST TO FIND IT.';
         this.saveGame();
       }
       // Shopkeeper at x=110, y=40
@@ -385,40 +388,56 @@ export default class FinalFantasyGame {
       r.text('▼', 138, 124, 0);
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('FINAL FANTASY', 40, 0, 1);
-      r.textCentered('ADVENTURE', 52, 1, 1);
-      r.textCentered('PRESS A OR START', 76, 0, 1);
-      r.textCentered('A: SWORD | B: POTION', 94, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('FINAL FANTASY', 22, 0, 1);
+      r.textCentered('ADVENTURE', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('ARROWS/WASD: EXPLORE REALM', 16, 58, 0);
+      r.text('A / Z: SWORD SLASH / TALK', 16, 70, 0);
+      r.text('B / X: DRINK HEAL POTION', 16, 82, 0);
+      r.text('VISIT SHOP FOR POTIONS (20G)', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('HERO FELL...', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('HERO FELL...', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('THE REALM WEEPS', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Victory Overlay
     if (this.gameWon) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('REALM SAVED!', 48, 0, 1);
-      r.textCentered('SHADOW DRAGON VANQUISHED', 64, 1, 1);
-      r.textCentered(`FINAL SCORE: ${this.score}`, 80, 0, 1);
-      r.textCentered('PRESS A TO RESTART', 96, 1, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('REALM SAVED!', 46, 0, 1);
+      r.textCentered('DRAGON VANQUISHED!', 62, 1, 1);
+      r.textCentered(`FINAL SCORE: ${this.score}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RESTART', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.gameWon && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

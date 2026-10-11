@@ -30,13 +30,16 @@ export default class SnakeGame {
   init(ctx) {
     this.ctx = ctx;
     this.highScore = ctx.storage.getHighScore('snake');
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.score = 0;
     this.gameOver = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.snake = [
       { x: 10, y: 8 },
       { x: 9, y: 8 },
@@ -136,9 +139,11 @@ export default class SnakeGame {
     if (head.y < 0) head.y = this.rows - 1;
     if (head.y >= this.rows) head.y = 0;
 
-    // Self collision
-    for (let i = 0; i < this.snake.length; i++) {
-      if (this.snake[i].x === head.x && this.snake[i].y === head.y) {
+    // Self collision (exclude vacating tail segment if not eating food)
+    const willEat = (head.x === this.food.x && head.y === this.food.y);
+    const bodyToCheck = willEat ? this.snake : this.snake.slice(0, -1);
+    for (let i = 0; i < bodyToCheck.length; i++) {
+      if (bodyToCheck[i].x === head.x && bodyToCheck[i].y === head.y) {
         this.gameOver = true;
         this.ctx.audio.playGameOver();
         this.ctx.renderer.shake(4, 0.3);
@@ -152,7 +157,7 @@ export default class SnakeGame {
     this.snake.unshift(head);
 
     // Food collision
-    if (head.x === this.food.x && head.y === this.food.y) {
+    if (willEat) {
       this.score += 10;
       this.ctx.audio.playCoin();
       if (this.ctx.onScoreUpdate) this.ctx.onScoreUpdate(this.score);
@@ -198,29 +203,44 @@ export default class SnakeGame {
       }
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('SNAKE', 48, 0, 2);
-      r.textCentered('PRESS A OR START', 75, 1, 1);
-      r.textCentered(`HIGH SCORE: ${this.highScore}`, 92, 0, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('SNAKE ARCADE', 22, 0, 1);
+      r.textCentered('CLASSIC RETRO EDITION', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('ARROWS/WASD: TURN SNAKE', 16, 58, 0);
+      r.text('SWIPES ALSO CONTROL TURNS', 16, 70, 0);
+      r.text('DEVOUR APPLES TO GROW & SCORE', 16, 82, 0);
+      r.text('AVOID CRASHING INTO YOUR BODY', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered(`BEST: ${this.highScore}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

@@ -45,10 +45,11 @@ export default class MarioGame {
 
   init(ctx) {
     this.ctx = ctx;
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.score = 0;
     this.coins = 0;
     this.goldenCoins = 0;
@@ -56,7 +57,9 @@ export default class MarioGame {
     this.level = 1;
     this.gameOver = false;
     this.gameWon = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.loadLevel(1);
   }
 
@@ -368,40 +371,56 @@ export default class MarioGame {
       r.fillRect(playerScreenX + (this.facingRight ? 2 : 0), Math.floor(this.py), 6, 3, 1);
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(15, 30, 130, 85, 3);
-      r.strokeRect(15, 30, 130, 85, 0);
-      r.textCentered('MARIO LAND 2', 42, 0, 1);
-      r.textCentered('6 GOLDEN COINS', 54, 1, 1);
-      r.textCentered('PRESS A OR START', 78, 0, 1);
-      r.textCentered('Z: JUMP | X: RUN', 96, 1, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('SUPER MARIO LAND 2', 22, 0, 1);
+      r.textCentered('6 GOLDEN COINS', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('◄ / ►: WALK / RUN', 16, 58, 0);
+      r.text('A / Z: JUMP & STOMP FOES', 16, 70, 0);
+      r.text('B / X: SPRINT (HOLD DOWN)', 16, 82, 0);
+      r.text('COLLECT COINS & CLEAR COURSE', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered('TRY AGAIN MARIO!', 74, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
-    // Victory Overlay
+    // Course Clear Victory Overlay
     if (this.gameWon) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('COURSE CLEAR!', 48, 0, 1);
-      r.textCentered(`GOLDEN COINS: ${this.goldenCoins}/6`, 64, 1, 1);
-      r.textCentered(`FINAL SCORE: ${this.score}`, 80, 0, 1);
-      r.textCentered('PRESS A TO RESTART', 96, 1, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('COURSE CLEAR!', 46, 0, 1);
+      r.textCentered(`GOLDEN COINS: ${this.goldenCoins}/6`, 62, 1, 1);
+      r.textCentered(`FINAL SCORE: ${this.score}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RESTART', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.gameWon && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }

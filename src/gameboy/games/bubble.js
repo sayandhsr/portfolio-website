@@ -127,13 +127,16 @@ export default class BubbleGame {
   init(ctx) {
     this.ctx = ctx;
     this.highScore = ctx.storage.getHighScore('bubble');
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.score = 0;
     this.gameOver = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.shotCount = 0;
     this.aimAngle = -Math.PI / 2;
     this.flyingBubble = null;
@@ -326,12 +329,20 @@ export default class BubbleGame {
   }
 
   descendCeiling() {
-    const newRow = [];
+    // Generate new top row (10 items)
+    const newTop = [];
     for (let c = 0; c < this.cols; c++) {
-      newRow.push(Math.floor(Math.random() * 4));
+      newTop.push(Math.floor(Math.random() * 4));
     }
     this.grid.pop();
-    this.grid.unshift(newRow);
+    this.grid.unshift(newTop);
+
+    // Ensure all row lengths match their alternating parity (even = cols, odd = cols - 1)
+    for (let r = 0; r < this.grid.length; r++) {
+      const targetLen = r % 2 === 1 ? this.cols - 1 : this.cols;
+      while (this.grid[r].length > targetLen) this.grid[r].pop();
+      while (this.grid[r].length < targetLen) this.grid[r].push(null);
+    }
     this.ctx.renderer.shake(2, 0.2);
   }
 
@@ -340,18 +351,18 @@ export default class BubbleGame {
 
     // Top HUD
     r.fillRect(0, 0, 160, 14, 1);
-    r.text(`BUBBLE`, 4, 4, 3);
-    r.text(`SCR:${this.score}`, 58, 4, 3);
-    r.text(`HI:${this.highScore}`, 115, 4, 3);
+    r.text('BUBBLE', 6, 4, 3);
+    r.text(`SCR:${this.score}`, 54, 4, 3);
+    r.text(`HI:${this.highScore}`, 112, 4, 3);
 
-    // Walls
-    const minX = this.gridStartX - 1;
-    const maxX = this.gridStartX + this.cols * this.bubbleDia;
+    // Playfield Walls
+    const minX = this.gridStartX - 1; // 19
+    const maxX = this.gridStartX + this.cols * this.bubbleDia; // 140
     r.line(minX, 14, minX, 144, 0);
     r.line(maxX, 14, maxX, 144, 0);
 
-    // Deadline at bottom
-    r.line(minX, 120, maxX, 120, 2);
+    // Deadline warning line
+    r.line(minX, 118, maxX, 118, 2);
 
     // Draw Grid Bubbles
     for (let row = 0; row < this.grid.length; row++) {
@@ -364,17 +375,15 @@ export default class BubbleGame {
       }
     }
 
-    // Aim Line
+    // Aim Line with clean dotted trajectory
     const launcherX = 80;
-    const launcherY = 132;
-    const aimLen = 25;
-    r.line(
-      launcherX,
-      launcherY,
-      launcherX + Math.cos(this.aimAngle) * aimLen,
-      launcherY + Math.sin(this.aimAngle) * aimLen,
-      0
-    );
+    const launcherY = 130;
+    const aimLen = 24;
+    for (let d = 7; d <= aimLen; d += 4) {
+      const ax = launcherX + Math.cos(this.aimAngle) * d;
+      const ay = launcherY + Math.sin(this.aimAngle) * d;
+      r.fillRect(ax - 1, ay - 1, 2, 2, 0);
+    }
 
     // Current Bubble in launcher
     if (!this.flyingBubble) {
@@ -386,57 +395,77 @@ export default class BubbleGame {
       this.renderBubble(r, this.flyingBubble.x, this.flyingBubble.y, this.flyingBubble.type);
     }
 
-    // Next Bubble preview
-    r.text('NEXT:', 4, 130, 0);
-    this.renderBubble(r, 142, 132, this.nextBubble);
+    // Next Bubble preview - neatly placed inside left footer
+    r.text('NEXT', 24, 126, 1);
+    this.renderBubble(r, 48, 130, this.nextBubble);
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('BUBBLE SHOOTER', 48, 0, 1);
-      r.textCentered('PRESS A OR START', 75, 1, 1);
-      r.textCentered(`HIGH SCORE: ${this.highScore}`, 92, 0, 1);
+      r.fillRect(8, 18, 144, 116, 3);
+      r.strokeRect(8, 18, 144, 116, 0);
+      r.strokeRect(10, 20, 140, 112, 1);
+
+      r.textCentered('BUBBLE SHOOTER', 24, 0, 1);
+      r.line(16, 34, 144, 34, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 38, 1, 1);
+      r.text('◄ / ► : AIM CANNON', 18, 50, 0);
+      r.text('A / Z : LAUNCH BUBBLE', 18, 62, 0);
+      r.text('TOUCH: TAP / SWIPE TO AIM', 18, 74, 0);
+      r.text('MATCH 3+ BUBBLES TO POP', 18, 86, 1);
+      r.text(`HIGH SCORE: ${this.highScore}`, 18, 98, 1);
+
+      r.fillRect(18, 110, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 114, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered(`BEST: ${this.highScore}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 
   renderBubble(r, x, y, type) {
-    const rad = this.bubbleRadius - 1;
-    // Outer circle
-    r.circle(x, y, rad, 0, false);
+    const rad = this.bubbleRadius - 1; // 5px radius
 
-    // 4 distinct interior patterns:
     if (type === 0) {
-      // Solid dark center
-      r.circle(x, y, rad - 2, 0, true);
+      // Solid Dark Sphere with specular shine
+      r.circle(x, y, rad, 0, true);
+      r.fillRect(x - 2, y - 2, 2, 2, 3);
     } else if (type === 1) {
-      // Cross pattern
-      r.line(x - 2, y, x + 2, y, 1);
-      r.line(x, y - 2, x, y + 2, 1);
+      // Shaded sphere with dark cross core and shine
+      r.circle(x, y, rad, 1, true);
+      r.circle(x, y, rad, 0, false);
+      r.fillRect(x - 1, y - 3, 2, 6, 0);
+      r.fillRect(x - 3, y - 1, 6, 2, 0);
+      r.fillRect(x - 2, y - 2, 1, 1, 3);
     } else if (type === 2) {
-      // Diamond pattern
-      r.fillRect(x - 1, y - 1, 3, 3, 2);
-      r.fillRect(x, y - 2, 1, 1, 2);
-      r.fillRect(x, y + 2, 1, 1, 2);
+      // Patterned ring sphere
+      r.circle(x, y, rad, 2, true);
+      r.circle(x, y, rad, 0, false);
+      r.circle(x, y, 2, 0, true);
+      r.fillRect(x - 2, y - 2, 1, 1, 3);
     } else {
-      // Ring pattern
-      r.circle(x, y, 2, 1, false);
+      // Crisp clear bubble with border and inner shine
+      r.circle(x, y, rad, 3, true);
+      r.circle(x, y, rad, 0, false);
+      r.circle(x, y, rad - 2, 2, false);
+      r.fillRect(x - 2, y - 2, 2, 2, 0);
     }
   }
 }

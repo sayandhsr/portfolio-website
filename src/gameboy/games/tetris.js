@@ -56,16 +56,19 @@ export default class TetrisGame {
   init(ctx) {
     this.ctx = ctx;
     this.highScore = ctx.storage.getHighScore('tetris');
-    this.reset();
+    this.inTitle = true;
+    this.reset(true);
   }
 
-  reset() {
+  reset(keepTitle = false) {
     this.score = 0;
     this.lines = 0;
     this.level = 1;
     this.dropInterval = 0.8;
     this.gameOver = false;
-    this.inTitle = false;
+    if (!keepTitle) {
+      this.inTitle = false;
+    }
     this.grid = Array.from({ length: this.boardHeight }, () => new Array(this.boardWidth).fill(null));
     this.bag = [];
     this.holdPiece = null;
@@ -275,9 +278,9 @@ export default class TetrisGame {
 
     // Soft drop
     let interval = this.dropInterval;
-    if (input.isDown(BUTTONS.DOWN)) {
+    const isSoftDropping = input.isDown(BUTTONS.DOWN);
+    if (isSoftDropping) {
       interval = 0.05;
-      this.score += 1;
     }
 
     // Step downward
@@ -286,6 +289,10 @@ export default class TetrisGame {
       this.dropTimer = 0;
       if (!this.collides(this.currentPiece.shape, this.pieceX, this.pieceY + 1)) {
         this.pieceY++;
+        if (isSoftDropping) {
+          this.score += 1;
+          if (this.ctx.onScoreUpdate) this.ctx.onScoreUpdate(this.score);
+        }
       } else {
         this.lockPiece();
       }
@@ -372,29 +379,44 @@ export default class TetrisGame {
       }
     }
 
-    // Title Overlay
+    // How to Play / Title Screen Overlay
     if (this.inTitle) {
-      r.fillRect(20, 35, 120, 75, 3);
-      r.strokeRect(20, 35, 120, 75, 0);
-      r.textCentered('TETRIS', 48, 0, 2);
-      r.textCentered('PRESS A OR START', 75, 1, 1);
-      r.textCentered(`HIGH SCORE: ${this.highScore}`, 92, 0, 1);
+      r.fillRect(8, 16, 144, 118, 3);
+      r.strokeRect(8, 16, 144, 118, 0);
+      r.strokeRect(10, 18, 140, 114, 1);
+
+      r.textCentered('TETRIS', 22, 0, 1);
+      r.textCentered('BLOCK PUZZLE RETRO', 32, 1, 1);
+      r.line(16, 42, 144, 42, 1);
+
+      r.textCentered('NOTICE: HOW TO PLAY', 46, 1, 1);
+      r.text('◄ / ►: SHIFT BLOCK', 16, 58, 0);
+      r.text('A / Z / ▲: ROTATE PIECE', 16, 70, 0);
+      r.text('▼: SOFT DROP | B: HOLD', 16, 82, 0);
+      r.text('FILL COMPLETE ROWS TO CLEAR', 16, 94, 1);
+
+      r.fillRect(18, 108, 124, 16, 0);
+      r.textCentered('PRESS A OR START', 112, 3, 1);
     }
 
     // Game Over Overlay
     if (this.gameOver) {
-      r.fillRect(25, 40, 110, 68, 3);
-      r.strokeRect(25, 40, 110, 68, 0);
-      r.textCentered('GAME OVER', 52, 0, 1);
-      r.textCentered(`SCORE: ${this.score}`, 68, 1, 1);
-      r.textCentered('PRESS A TO RETRY', 85, 0, 1);
+      r.fillRect(20, 36, 120, 74, 3);
+      r.strokeRect(20, 36, 120, 74, 0);
+      r.strokeRect(22, 38, 116, 70, 1);
+      r.textCentered('GAME OVER', 46, 0, 1);
+      r.textCentered(`SCORE: ${this.score}`, 62, 1, 1);
+      r.textCentered(`BEST: ${this.highScore}`, 76, 1, 1);
+      r.fillRect(28, 90, 104, 14, 0);
+      r.textCentered('PRESS A TO RETRY', 94, 3, 1);
     }
 
     // Pause Overlay
     if (this.paused && !this.gameOver && !this.inTitle) {
-      r.fillRect(40, 60, 80, 26, 3);
-      r.strokeRect(40, 60, 80, 26, 0);
-      r.textCentered('PAUSED', 70, 0, 1);
+      r.fillRect(40, 58, 80, 28, 3);
+      r.strokeRect(40, 58, 80, 28, 0);
+      r.textCentered('PAUSED', 64, 0, 1);
+      r.textCentered('START: RESUME', 74, 1, 1);
     }
   }
 }
