@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import GameBoyHub from '../gameboy/GameBoyHub';
-import { isGameBoyTrigger } from '../gameboy/triggerMatcher';
+import { classifyTerminalCommand, DIRECTIVE_RESPONSES, getSystemClockString } from './terminalRouter';
 import './UNIXTerminal.css';
 
 // API Keys strictly from environment
@@ -315,10 +315,10 @@ or enter any query to search.`;
     setMessages(prev => [...prev, { sender: 'user', text: userMsg, typing: false }]);
     setInput('');
 
-    const cleanCmd = userMsg.toLowerCase().replace(/^>\s*/, '').trim();
+    const decision = classifyTerminalCommand(userMsg);
 
     // 1. CLEAR COMMAND
-    if (cleanCmd === 'clear' || cleanCmd === 'cls') {
+    if (decision.type === 'CLEAR') {
       setMessages([
         {
           sender: 'system',
@@ -331,7 +331,7 @@ or enter any query to search.`;
     }
 
     // 2. AUDIO TOGGLE COMMAND
-    if (['toggle_audio', 'audio', 'sound', 'mute', 'unmute'].includes(cleanCmd)) {
+    if (decision.type === 'AUDIO') {
       const nextAudio = !audioEnabledRef.current;
       toggleAudio(nextAudio);
       setMessages(prev => [
@@ -346,12 +346,12 @@ or enter any query to search.`;
     }
 
     // 3. MATCHA / TIP
-    if (['tip', 'donate', 'matcha', 'coffee', 'buy matcha'].includes(cleanCmd) || userMsg === '> execute tip_matcha.sh') {
+    if (decision.type === 'MATCHA') {
       setMessages(prev => [
         ...prev,
         {
           sender: 'system',
-          text: `[BUY A MATCHA]\nprotocol : direct UPI\nupi id   : sayandhsr123-2@okicici\npayee    : Sayandh Raj\nlink     : upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR`,
+          text: DIRECTIVE_RESPONSES.MATCHA,
           typing: true
         }
       ]);
@@ -359,7 +359,7 @@ or enter any query to search.`;
     }
 
     // 4. GAME BOY TRIGGER & EXIT
-    if (cleanCmd === 'exit' || cleanCmd === 'quit') {
+    if (decision.type === 'EXIT') {
       if (showGameBoy) {
         setShowGameBoy(false);
         setTimeout(() => chatInputRef.current?.focus(), 50);
@@ -367,163 +367,41 @@ or enter any query to search.`;
       }
     }
 
-    if (isGameBoyTrigger(cleanCmd)) {
+    if (decision.type === 'GAMEBOY') {
       setShowGameBoy(true);
       return;
     }
 
-    setIsProcessing(true);
-    let replyText = '';
-
-    const matchesAny = (keywords) => keywords.some(k => cleanCmd.includes(k));
-
-    // ========== OFFLINE DIRECTIVES ==========
-
-    // GREETINGS
-    if (matchesAny(['hi', 'hello', 'hey', 'yo', 'sup', 'helo', 'hii', 'hiii', 'howdy', 'good morning', 'good evening', 'gm', 'gn'])) {
-      replyText = `system operational.\nenter a directive: whois | skills | projects | contact | help\nor ask any technical query.`;
-    }
-    // HELP / DIRECTIVES
-    else if (matchesAny(['help', 'commands', 'menu', 'options', 'what can you do', 'guide', 'man'])) {
-      replyText = `[AVAILABLE DIRECTIVES]
-whois      - identity, education & specialization
-skills     - machine learning & engineering stack
-projects   - live deployments & repositories
-experience - professional timeline & certificates
-badges     - 23 verified credly badges (IBM / Google)
-contact    - direct comm channels
-education  - academic credentials
-game       - retro game boy arcade
-audio      - toggle terminal audio
-clear      - clear terminal buffer`;
-    }
-    // WHOIS / ABOUT
-    else if (matchesAny(['whois', 'who is', 'about', 'bio', 'who are you', 'tell me about', 'whose portfolio', 'profile'])) {
-      replyText = `[IDENTITY: SAYANDH RAJ]
-role       : AI/ML Engineer & Data Architect
-education  : 1. M.Sc. Computer Science (AI Specialization) [2026-2028, Pursuing]
-                Kerala University of Digital Sciences, Innovation and Technology
-                (Digital University of Kerala / DUK, formerly IIITM-K), Trivandrum
-             2. BCA in AI & Data Science [2023-2026, CGPA: 8.59/10]
-                Yenepoya (Deemed to be University), Bengaluru Off-Campus
-                (Main University: Mangalore, Karnataka, India)
-                Industrial Partners: IBM & TCS iON
-domain     : Deep Learning, Neural Networks, Generative AI (LLMs/RAG),
-             NLP, Computer Vision, Scalable Data Pipelines
-github     : https://github.com/sayandhsr
-linkedin   : https://linkedin.com/in/sayandh-raj
-credly     : https://credly.com/users/sayandhraj`;
-    }
-    // SKILLS
-    else if (matchesAny(['skill', 'stack', 'tech', 'tools', 'languages', 'framework', 'what do you know', 'arsenal'])) {
-      replyText = `[TECHNICAL ARSENAL]
-ai / ml    : PyTorch, TensorFlow, Deep Neural Networks, NLP, OpenCV
-gen ai     : LangChain, Hugging Face, RAG Architecture, OpenRouter
-analytics  : Pandas, NumPy, Scikit-Learn, Power BI, Tableau, SQL, R
-systems    : FastAPI, Docker, Firebase, Supabase, Git, Vercel`;
-    }
-    // PROJECTS
-    else if (cleanCmd === 'projects' || cleanCmd === 'project' || matchesAny(['work', 'portfolio', 'built', 'created', 'deployments'])) {
-      replyText = `[DEPLOYMENTS]
-1. Unsullied Code - Offline-first mobile IDE with true AST engine
-   url: https://unsulliedcode.vercel.app/
-2. KILL SWITCH - Brutalist smoking community platform
-   url: https://notkillwitch.vercel.app/
-3. ATS Resume Analyzer & AI Builder - JD parsing & vector ranking
-   url: https://github.com/sayandhsr
-4. RAG Document Chatbot - Enterprise multi-doc QA engine
-   url: https://github.com/sayandhsr
-5. Precision Crop Forecasting & Skin Disease Prediction
-   url: https://github.com/sayandhsr`;
-    }
-    // KILL SWITCH
-    else if (matchesAny(['kill switch', 'notkillwitch', 'smoking community'])) {
-      replyText = `[PROJECT: KILL SWITCH]
-brutalist community platform for open debate arenas and culture.
-status : live
-url    : https://notkillwitch.vercel.app/`;
-    }
-    // UNSULLIED CODE
-    else if (matchesAny(['unsullied', 'unsullied code', 'unsulliedcode', 'ide'])) {
-      replyText = `[PROJECT: UNSULLIED CODE]
-offline-first mobile IDE with client-side AST engine and 3D tactile motion.
-status : live
-url    : https://unsulliedcode.vercel.app/`;
-    }
-    // EXPERIENCE
-    else if (matchesAny(['experience', 'intern', 'company', 'history', 'job'])) {
-      replyText = `[EXPERIENCE TIMELINE]
-- Networkers Home : AI Engineering Intern (ML network optimization)
-  cert: https://drive.google.com/file/d/14CDnqWtqvgZdBRMsQfnHxQSejRQ_rW3H/view
-- TCS iON : Applied Industry Project (Cloud Big Data Logistics)
-  cert: https://drive.google.com/file/d/1PaUBkPkdkWM6r0UbMbtRwC3ANRpt4TKP/view
-- AISECT Learn : Python for Data Science Intern
-  cert: https://drive.google.com/file/d/1FlF3gsDiORiWDPdoq1mZKw5H9y0BIHad/view
-- The Developers Arena : Data Science & Analytics Intern
-  cert: https://drive.google.com/file/d/1tIRGmHjQig1_3QKwpW9yxTmygaZBNiWH/view
-- IBM : Applied AI Programs & Industry Projects`;
-    }
-    // CERTIFICATIONS & BADGES
-    else if (matchesAny(['cert', 'certification', 'badge', 'badges', 'credly', 'credential', 'verified'])) {
-      replyText = `[VERIFIED CREDENTIALS]
-23 verified Credly badges across IBM, Google & Coursera:
-- IBM Artificial Intelligence & Machine Learning Graduate
-- Google Advanced Data Analytics Professional Certificate
-- Google Data Analytics Professional Certificate
-- IBM Data Science Professional Certificate (V3)
-- Machine Learning with Python (V2)
-registry: https://credly.com/users/sayandhraj`;
-    }
-    // EDUCATION
-    else if (matchesAny(['education', 'college', 'university', 'degree', 'study', 'school', 'bca', 'msc', 'academics'])) {
-      replyText = `[ACADEMIC CREDENTIALS]
-1. Master of Science (M.Sc.) in Computer Science (Artificial Intelligence)
-   period      : 2026 – 2028 [Pursuing / Active Scholar]
-   institution : Kerala University of Digital Sciences, Innovation and Technology
-                 (Digital University of Kerala / DUK)
-   former name : Indian Institute of Information Technology and Management - Kerala (IIITM-K)
-   campus      : Trivandrum (Thiruvananthapuram), Kerala, India
-   focus       : Deep Learning, Neural Architectures, Autonomous AI Systems
-
-2. Bachelor of Computer Applications (BCA) in AI & Data Science
-   period              : 2023 – 2026
-   institution         : Yenepoya (Deemed to be University)
-   campus              : Bengaluru Off-Campus, Karnataka
-   main campus         : Mangalore, Karnataka, India
-   industrial partners : IBM (Applied AI) & TCS iON (Big Data Logistics)
-   cgpa                : 8.59 / 10.00
-   focus               : Machine Learning, Statistical Modeling, Data Pipelines`;
-    }
-    // CONTACT
-    else if (matchesAny(['contact', 'phone', 'email', 'mail', 'reach', 'call', 'number', 'linkedin', 'github', 'kaggle'])) {
-      replyText = `[COMM CHANNELS]
-phone    : +91 8590679716
-email    : sayandhsr123@gmail.com
-github   : https://github.com/sayandhsr
-linkedin : https://linkedin.com/in/sayandh-raj
-kaggle   : https://kaggle.com/sayandhsr
-x/tw     : https://twitter.com/SayandhSr`;
-    }
-    // DATE / TIME
-    else if (matchesAny(['date', 'time', 'day', 'month', 'year', 'today', 'now', 'clock'])) {
-      const now = new Date();
-      replyText = `system clock: ${now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`;
-    }
-
-    // IF OFFLINE DIRECTIVE MATCHED
-    if (replyText) {
+    // 5. DATE / TIME
+    if (decision.type === 'DATE_TIME') {
+      const clockText = getSystemClockString();
       setIsAiQuery(false);
       setMessages(prev => [
         ...prev,
-        { sender: 'ai', text: replyText, typing: true }
+        { sender: 'ai', text: clockText, typing: true }
       ]);
-      logToFirestore(userMsg, replyText);
+      logToFirestore(userMsg, clockText);
       setIsProcessing(false);
       return;
     }
 
-    // ========== REMOTE AI QUERY (Claude/Codex style) ==========
+    // 6. OFFLINE DIRECTIVES (WHOIS, SKILLS, PROJECTS, EXPERIENCE, BADGES, EDUCATION, CONTACT, HELP, GREETING)
+    if (decision.type in DIRECTIVE_RESPONSES) {
+      const offlineReply = DIRECTIVE_RESPONSES[decision.type];
+      setIsAiQuery(false);
+      setMessages(prev => [
+        ...prev,
+        { sender: 'ai', text: offlineReply, typing: true }
+      ]);
+      logToFirestore(userMsg, offlineReply);
+      setIsProcessing(false);
+      return;
+    }
+
+    // ========== REMOTE AI QUERY (Claude/Codex style via spurce.ai) ==========
+    setIsProcessing(true);
     setIsAiQuery(true);
+    let replyText = '';
     let aiSuccess = false;
 
     try {
@@ -592,6 +470,8 @@ x/tw     : https://twitter.com/SayandhSr`;
       } else if (cleaned.startsWith('```') && cleaned.endsWith('```')) {
         cleaned = cleaned.slice(3, -3).trim();
       }
+      // Strip markdown bold wrappers (**text**) so terminal output looks like pure CLI text
+      cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, '$1');
       cleaned += '\n\n[via spurce.ai]';
 
       setMessages(prev => [
