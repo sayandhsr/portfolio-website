@@ -4,9 +4,12 @@
   --asphalt-black: #050505;
   --concrete-white: #e4e4e4;
   --industrial-cream: #d9d5c3;
-  --accent-red: #15803d; /* Changed from red to dark green */
-  --accent-green: #15803d; /* Dark green theme accent */
-  --accent-dark-green: #15803d;
+  --accent-coffee: #8b5a2b; /* Rich coffee brown */
+  --accent-coffee-light: #c49a6c; /* Warm coffee / crema */
+  --accent-coffee-dark: #6f4e37; /* Roasted espresso */
+  --accent-red: var(--accent-coffee); /* Unified site accent */
+  --accent-green: var(--accent-coffee);
+  --accent-dark-green: var(--accent-coffee);
   
   --font-display: 'Anton', sans-serif;
   --font-body: 'Inter', sans-serif;

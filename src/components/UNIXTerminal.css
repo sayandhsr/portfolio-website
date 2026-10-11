@@ -1,6 +1,6 @@
 /* ==========================================================================
    MINIMALIST UNIX CLI TERMINAL
-   Palette: Black (#050505), Green (#22c55e), Gold (#facc15), White (#ffffff)
+   Palette: Black (#050505), Coffee Brown (#c49a6c / #8b5a2b), White (#ffffff)
    Authentic Hacker/CLI Aesthetic: No boxes, no bold, no underlines
    ========================================================================== */
 
@@ -42,7 +42,7 @@
 }
 
 .toggle-sym {
-  color: #22c55e;
+  color: #c49a6c;
 }
 
 .terminal-toggle:hover .toggle-sym {
@@ -105,7 +105,7 @@
 }
 
 .header-sym {
-  color: #22c55e;
+  color: #c49a6c;
 }
 
 .terminal-header-controls {
@@ -132,7 +132,7 @@
 }
 
 .cli-btn.close-btn:hover {
-  color: #facc15;
+  color: #c49a6c;
 }
 
 /* ==========================================================================
@@ -168,7 +168,7 @@
 }
 
 .terminal-body::-webkit-scrollbar-thumb:hover {
-  background: #facc15;
+  background: #c49a6c;
 }
 
 /* Message Entries */
@@ -183,7 +183,7 @@
   align-items: center;
 }
 
-/* Prompts: Green for Agent, Gold for User */
+/* Prompts: Coffee Brown for Agent & User */
 .cli-prompt {
   font-size: 0.85rem;
   font-weight: normal;
@@ -191,11 +191,11 @@
 }
 
 .cli-prompt.user {
-  color: #facc15; /* Gold */
+  color: #c49a6c; /* Warm Coffee */
 }
 
 .cli-prompt.ai {
-  color: #22c55e; /* Green */
+  color: #c49a6c; /* Coffee */
 }
 
 /* Message Output: White text, no background boxes */
@@ -226,42 +226,42 @@
 
 /* Section Header Lines [ HEADER ] */
 .cli-header-line {
-  color: #facc15; /* Gold */
+  color: #c49a6c; /* Coffee */
   margin-top: 0.2rem;
   margin-bottom: 0.1rem;
 }
 
 /* Spurce.ai attribution footer line */
 .cli-spurce-line {
-  color: #22c55e; /* Green */
+  color: #c49a6c; /* Coffee */
   font-size: 0.82rem;
   opacity: 0.85;
   margin-top: 0.3rem;
 }
 
-/* Clean Terminal Links: Gold, No underlines */
+/* Clean Terminal Links: Coffee Brown, No underlines */
 .cli-link {
-  color: #facc15;
+  color: #c49a6c;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.12s ease;
 }
 
 .cli-link:hover {
-  color: #22c55e;
+  color: #ffffff;
   text-decoration: none;
 }
 
-/* Clickable Directive Words: Gold with reverse-video highlight on hover */
+/* Clickable Directive Words: Coffee with reverse-video highlight on hover */
 .cli-directive {
-  color: #facc15;
+  color: #c49a6c;
   cursor: pointer;
   padding: 0 3px;
   transition: all 0.12s ease;
 }
 
 .cli-directive:hover {
-  background: #facc15;
+  background: #c49a6c;
   color: #050505;
 }
 
@@ -283,14 +283,14 @@
 }
 
 .cli-spinner {
-  color: #22c55e; /* Green Braille Spinner */
+  color: #c49a6c; /* Coffee Braille Spinner */
   font-family: inherit;
   font-size: 1rem;
   line-height: 1;
 }
 
 .cli-stage-text {
-  color: #facc15; /* Gold Status Text */
+  color: #c49a6c; /* Coffee Status Text */
   font-size: 0.85rem;
   letter-spacing: 0.03em;
 }
@@ -309,7 +309,7 @@
 }
 
 .cli-input-prompt {
-  color: #facc15; /* Gold */
+  color: #c49a6c; /* Coffee */
   font-size: 0.85rem;
   user-select: none;
   white-space: nowrap;
@@ -332,7 +332,7 @@
 }
 
 .cli-cursor-blink {
-  color: #22c55e; /* Green block cursor */
+  color: #c49a6c; /* Coffee block cursor */
   animation: cliBlink 1s step-end infinite;
   user-select: none;
 }

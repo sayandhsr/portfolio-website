@@ -42,9 +42,9 @@
   font-family: var(--font-mono);
   font-size: 0.78rem;
   font-weight: 600;
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #c49a6c;
+  background: rgba(139, 90, 43, 0.15);
+  border: 1px solid rgba(196, 154, 108, 0.35);
   padding: 0.3rem 0.65rem;
   border-radius: 2px;
   letter-spacing: 0.04em;
@@ -101,7 +101,7 @@
   font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 600;
-  color: #22c55e;
+  color: #c49a6c;
   letter-spacing: 0.02em;
 }
 
@@ -109,7 +109,7 @@
 .edu-institution-info {
   margin-bottom: 1.4rem;
   padding-left: 0.85rem;
-  border-left: 3px solid #15803d;
+  border-left: 3px solid #8b5a2b;
 }
 
 .edu-inst-main {
@@ -151,7 +151,7 @@
   font-family: var(--font-mono);
   font-size: 0.76rem;
   font-weight: 700;
-  color: #22c55e;
+  color: #c49a6c;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 0.85rem;
