@@ -18,7 +18,7 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
   const inputRef = useRef(null);
   const audioRef = useRef(null);
 
-  // States
+  // React UI States
   const [bootPhase, setBootPhase] = useState('booting'); // 'booting' | 'ready'
   const [activeGameId, setActiveGameId] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -26,27 +26,88 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [paletteName, setPaletteName] = useState('classic');
-  const [touchSetting, setTouchSetting] = useState('auto'); // 'auto', 'always', 'never'
+  const [touchSetting, setTouchSetting] = useState('always'); // 'always', 'auto', 'never'
   const [reducedMotion, setReducedMotion] = useState(false);
   const [layoutMode, setLayoutMode] = useState('stacked');
   const [screenScale, setScreenScale] = useState(1);
 
-  // Active game instance
+  // Mutable refs for 60 FPS Engine RAF loop to eliminate stale closure traps
+  const bootPhaseRef = useRef('booting');
   const activeGameRef = useRef(null);
   const activeGameIdRef = useRef(null);
   const selectedIdxRef = useRef(0);
   const bootTimerRef = useRef(0);
+  const settingsOpenRef = useRef(false);
+  const isFocusedRef = useRef(true);
 
-  // Keep refs in sync
+  // Synchronize refs
   activeGameIdRef.current = activeGameId;
   selectedIdxRef.current = selectedIdx;
+  bootPhaseRef.current = bootPhase;
+  settingsOpenRef.current = settingsOpen;
+  isFocusedRef.current = isFocused;
 
-  // Initialize Core Subsystems
+  // Updatable loop handlers to prevent closure capture
+  const onUpdateRef = useRef(null);
+  const onRenderRef = useRef(null);
+
+  // Instant skip boot sequence
+  const skipBoot = useCallback(() => {
+    audioRef.current?.ensureContext();
+    bootPhaseRef.current = 'ready';
+    setBootPhase('ready');
+  }, []);
+
+  // Launch a selected game
+  const launchGame = useCallback(async (gameId) => {
+    const meta = GAMES.find(g => g.id === gameId);
+    if (!meta) return;
+
+    try {
+      audioRef.current?.ensureContext();
+      const mod = await meta.loader();
+      const GameClass = mod.default || mod;
+      const instance = new GameClass();
+
+      instance.init({
+        renderer: rendererRef.current,
+        input: inputRef.current,
+        audio: audioRef.current,
+        storage: Storage,
+        onGameOver: () => {},
+        onScoreUpdate: (score) => {
+          Storage.setHighScore(gameId, score);
+        }
+      });
+
+      activeGameRef.current = instance;
+      activeGameIdRef.current = gameId;
+      setActiveGameId(gameId);
+      Storage.setLastPlayed(gameId);
+    } catch (err) {
+      console.error('Failed to load game cartridge:', err);
+    }
+  }, []);
+
+  // Return to Cartridge Menu
+  const returnToMenu = useCallback(() => {
+    if (activeGameRef.current?.destroy) {
+      activeGameRef.current.destroy();
+    }
+    activeGameRef.current = null;
+    activeGameIdRef.current = null;
+    setActiveGameId(null);
+    audioRef.current?.stopAll();
+    shellRef.current?.focus();
+    inputRef.current?.setFocused(true);
+  }, []);
+
+  // Initialize Subsystems
   useEffect(() => {
     Storage.migrateLegacy();
     const settings = Storage.getSettings();
     setPaletteName(settings.palette || 'classic');
-    setTouchSetting(settings.touchControls || 'auto');
+    setTouchSetting(settings.touchControls || 'always');
     setReducedMotion(!!settings.reducedMotion);
     setIsMuted(!settings.soundEnabled);
 
@@ -67,31 +128,35 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
     renderer.setReducedMotion(settings.reducedMotion);
     rendererRef.current = renderer;
 
-    // Engine
+    // Engine 60 FPS fixed timestep loop
     const engine = new Engine({
       renderer,
       input,
       audio,
       onUpdate: (dt, inp) => {
-        handleUpdate(dt, inp);
+        onUpdateRef.current?.(dt, inp);
       },
       onRender: (rnd) => {
-        handleRender(rnd);
+        onRenderRef.current?.(rnd);
       }
     });
     engineRef.current = engine;
     engine.start();
 
-    // Focus shell
-    shellRef.current?.focus();
+    // Auto-focus shell for instant keyboard reception
+    setTimeout(() => {
+      shellRef.current?.focus();
+      input.setFocused(true);
+    }, 20);
 
-    // Start boot sequence
+    // Initial boot sequence
     bootTimerRef.current = 0;
+    bootPhaseRef.current = 'booting';
     setTimeout(() => {
       audio.playBootChime();
-    }, 250);
+    }, 200);
 
-    // IntersectionObserver to auto-pause when scrolled out of view
+    // Auto-pause when scrolled out of view via IntersectionObserver
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -130,21 +195,21 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
       const h = shell.clientHeight;
       if (!w || !h) return;
 
-      // Determine Layout Mode: side-by-side if wide, stacked if tall
-      const newLayout = w > h * 1.25 && w > 420 ? 'side' : 'stacked';
+      // Layout: side-by-side if wide, stacked if tall/narrow
+      const isWide = w > 520 && w > h * 1.15;
+      const newLayout = isWide ? 'side' : 'stacked';
       setLayoutMode(newLayout);
 
       // Available screen space calculation
-      let availW = newLayout === 'side' ? Math.max(160, w * 0.55 - 24) : w - 24;
-      let availH = newLayout === 'side' ? h - 24 : Math.max(144, h * 0.58 - 30);
+      let availW = newLayout === 'side' ? Math.max(160, w * 0.58 - 30) : w - 24;
+      let availH = newLayout === 'side' ? h - 30 : Math.max(144, h * 0.58 - 30);
 
-      // Integer scale calculation
+      // Integer scale calculation (160x144 canvas)
       let intScale = Math.floor(Math.min(availW / 160, availH / 144));
       if (intScale < 1) {
-        // Fractional scale
         intScale = Math.min(availW / 160, availH / 144);
       }
-      setScreenScale(Math.max(0.7, intScale));
+      setScreenScale(Math.max(0.75, Math.min(4, intScale)));
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
@@ -154,35 +219,60 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Update loop dispatched by Engine
+  // Update logic dispatched by Engine 60 FPS
   const handleUpdate = (dt, input) => {
     // 1. Boot Phase
-    if (bootPhase === 'booting') {
+    if (bootPhaseRef.current === 'booting') {
       bootTimerRef.current += dt;
-      // Skip boot on any key press
+      // Skip boot on any key/button press or timeout after 1.2s
       if (
         input.justPressed(BUTTONS.A) ||
         input.justPressed(BUTTONS.START) ||
         input.justPressed(BUTTONS.B) ||
-        bootTimerRef.current > 1.6
+        input.justPressed(BUTTONS.SELECT) ||
+        input.justPressed(BUTTONS.UP) ||
+        input.justPressed(BUTTONS.DOWN) ||
+        input.justPressed(BUTTONS.LEFT) ||
+        input.justPressed(BUTTONS.RIGHT) ||
+        bootTimerRef.current > 1.2
       ) {
-        setBootPhase('ready');
+        skipBoot();
       }
       return;
     }
 
     // 2. Active Game Running
     if (activeGameRef.current) {
+      if (input.justPressed(BUTTONS.ESC)) {
+        returnToMenu();
+        return;
+      }
       activeGameRef.current.update(dt, input);
       return;
     }
 
-    // 3. Menu Navigation
+    // 3. Settings modal open: pause menu interaction
+    if (settingsOpenRef.current) {
+      if (
+        input.justPressed(BUTTONS.B) ||
+        input.justPressed(BUTTONS.ESC) ||
+        input.justPressed(BUTTONS.SELECT)
+      ) {
+        setSettingsOpen(false);
+      }
+      return;
+    }
+
+    // 4. Cartridge Selection Menu Navigation
     if (input.justPressed(BUTTONS.UP)) {
-      setSelectedIdx(prev => (prev > 0 ? prev - 1 : GAMES.length - 1));
+      const next = selectedIdxRef.current > 0 ? selectedIdxRef.current - 1 : GAMES.length - 1;
+      selectedIdxRef.current = next;
+      setSelectedIdx(next);
       audioRef.current?.playCursor();
     } else if (input.justPressed(BUTTONS.DOWN)) {
-      setSelectedIdx(prev => (prev < GAMES.length - 1 ? prev + 1 : 0));
+      const next = selectedIdxRef.current < GAMES.length - 1 ? selectedIdxRef.current + 1 : 0;
+      selectedIdxRef.current = next;
+      setSelectedIdx(next);
       audioRef.current?.playCursor();
     } else if (input.justPressed(BUTTONS.A) || input.justPressed(BUTTONS.START)) {
       audioRef.current?.playSelect();
@@ -195,60 +285,61 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
     }
   };
 
-  // Render loop dispatched by Engine
+  // Render logic dispatched by Engine
   const handleRender = (r) => {
-    // 1. Boot Phase Rendering
-    if (bootPhase === 'booting') {
+    // 1. Boot Phase Screen
+    if (bootPhaseRef.current === 'booting') {
       r.clear(3);
-      // Logo dropping in from top
-      const progress = Math.min(1, bootTimerRef.current / 0.8);
-      const logoY = Math.floor(progress * 55);
+      // Classic dropping Game Boy logo animation
+      const progress = Math.min(1, bootTimerRef.current / 0.55);
+      const logoY = Math.floor(progress * 52);
 
       r.fillRect(20, logoY, 120, 24, 0);
       r.fillRect(22, logoY + 2, 116, 20, 3);
       r.textCentered('GAME BOY', logoY + 8, 0, 1);
-      r.text('®', 115, logoY + 6, 0);
+      r.text('®', 116, logoY + 7, 0);
 
-      r.textCentered('NINTENDO®', 110, 1, 1);
+      r.textCentered('NINTENDO®', 108, 1, 1);
       return;
     }
 
-    // 2. Active Game Rendering
+    // 2. Active Game Screen
     if (activeGameRef.current) {
       activeGameRef.current.render(r);
       return;
     }
 
-    // 3. Game Select Screen Rendering
+    // 3. Cartridge Selection Menu
     r.clear(3);
 
-    // Menu Top Header
+    // Top Header Banner
     r.fillRect(0, 0, 160, 16, 0);
-    r.textCentered('GAME BOY CARTRIDGES', 5, 3, 1);
+    r.textCentered('SELECT CARTRIDGE', 5, 3, 1);
 
-    // List of games: display 4 games at a time based on current index
+    // Display 4 games around current index
     const total = GAMES.length;
-    const pageStart = Math.max(0, Math.min(total - 4, selectedIdx - 1));
+    const current = selectedIdxRef.current;
+    const pageStart = Math.max(0, Math.min(total - 4, current - 1));
 
     for (let i = 0; i < 4; i++) {
       const idx = pageStart + i;
       if (idx >= total) break;
       const game = GAMES[idx];
-      const isSelected = idx === selectedIdx;
-      const y = 24 + i * 26;
+      const isSelected = idx === current;
+      const y = 22 + i * 26;
 
       if (isSelected) {
-        // Highlight row
+        // Highlight active row
         r.fillRect(4, y - 2, 152, 24, 1);
         r.fillRect(6, y, 148, 20, 3);
         r.text('▶', 8, y + 6, 0);
       }
 
       // Title & Genre
-      r.text(game.title.substring(0, 18), isSelected ? 20 : 12, y + 2, isSelected ? 0 : 1);
+      r.text(game.title.substring(0, 17), isSelected ? 20 : 12, y + 2, isSelected ? 0 : 1);
       r.text(game.genre, isSelected ? 20 : 12, y + 11, 2);
 
-      // High Score / Tag
+      // High Score / Last Played
       const hi = Storage.getHighScore(game.id);
       const isLast = Storage.getLastPlayed() === game.id;
       if (isLast) {
@@ -258,49 +349,59 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
       }
     }
 
-    // Page indicator
+    // Bottom Navigation Bar
     r.line(4, 126, 156, 126, 1);
-    r.text(`[${selectedIdx + 1}/${total}]`, 8, 131, 1);
-    r.text('A:PLAY  SELECT:SET', 54, 131, 0);
+    r.text(`[${current + 1}/${total}]`, 8, 131, 1);
+    r.text('A:PLAY  SELECT:SET', 52, 131, 0);
   };
 
-  // Launch a game
-  const launchGame = async (gameId) => {
-    const meta = GAMES.find(g => g.id === gameId);
-    if (!meta) return;
+  // Keep RAF handler refs fresh on every render
+  onUpdateRef.current = handleUpdate;
+  onRenderRef.current = handleRender;
 
-    try {
-      const mod = await meta.loader();
-      const GameClass = mod.default || mod;
-      const instance = new GameClass();
+  // Canvas Click / Tap Handler
+  const handleCanvasClick = (e) => {
+    audioRef.current?.ensureContext();
+    shellRef.current?.focus();
+    inputRef.current?.setFocused(true);
+    engineRef.current?.resume();
 
-      instance.init({
-        renderer: rendererRef.current,
-        input: inputRef.current,
-        audio: audioRef.current,
-        storage: Storage,
-        onGameOver: () => {},
-        onScoreUpdate: (score) => {
-          Storage.setHighScore(gameId, score);
+    // Skip boot if currently booting
+    if (bootPhaseRef.current === 'booting') {
+      skipBoot();
+      return;
+    }
+
+    // Direct game selection by clicking row in menu
+    if (!activeGameRef.current && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const scaleY = 144 / rect.height;
+      const clickY = (e.clientY - rect.top) * scaleY;
+
+      const total = GAMES.length;
+      const current = selectedIdxRef.current;
+      const pageStart = Math.max(0, Math.min(total - 4, current - 1));
+
+      for (let i = 0; i < 4; i++) {
+        const rowY = 22 + i * 26;
+        if (clickY >= rowY - 2 && clickY <= rowY + 24) {
+          const clickedIdx = pageStart + i;
+          if (clickedIdx < total) {
+            if (selectedIdxRef.current === clickedIdx) {
+              // Clicked already selected game -> Launch!
+              audioRef.current?.playSelect();
+              launchGame(GAMES[clickedIdx].id);
+            } else {
+              // Select clicked game
+              selectedIdxRef.current = clickedIdx;
+              setSelectedIdx(clickedIdx);
+              audioRef.current?.playCursor();
+            }
+          }
+          break;
         }
-      });
-
-      activeGameRef.current = instance;
-      setActiveGameId(gameId);
-      Storage.setLastPlayed(gameId);
-    } catch {
-      // Fallback
+      }
     }
-  };
-
-  // Return to Game Boy Menu
-  const returnToMenu = () => {
-    if (activeGameRef.current?.destroy) {
-      activeGameRef.current.destroy();
-    }
-    activeGameRef.current = null;
-    setActiveGameId(null);
-    audioRef.current?.stopAll();
   };
 
   // Palette toggler
@@ -323,17 +424,18 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
     });
   };
 
-  // Touch button events
+  // Touch & Mouse Virtual Button Handlers
   const handleTouchButton = (btn, isDown) => {
+    audioRef.current?.ensureContext();
     inputRef.current?.setButtonState(btn, isDown);
   };
 
-  // Should show touch controls?
-  const shouldShowTouch = touchSetting === 'always' || (touchSetting === 'auto' && (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)));
+  // Controls Visibility: default to always show so desktop mouse & touch users can use it
+  const shouldShowTouch = touchSetting !== 'never';
 
   return (
     <div className="gbx-root" ref={rootRef}>
-      {/* Game Boy Top Header inside chatbot window */}
+      {/* Game Boy Unified Header */}
       <div className="gbx-header">
         <div className="gbx-header-title">
           <span>🎮</span>
@@ -342,24 +444,24 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
 
         <div className="gbx-header-actions">
           {activeGameId && (
-            <button className="gbx-btn" onClick={returnToMenu} title="Return to Game Menu">
+            <button className="gbx-btn" onClick={returnToMenu} title="Return to Cartridge Menu">
               MENU
             </button>
           )}
 
-          <button className="gbx-btn" onClick={() => setSettingsOpen(prev => !prev)} title="Settings">
+          <button className="gbx-btn" onClick={() => setSettingsOpen(prev => !prev)} title="Game Boy Settings">
             ⚙
           </button>
 
-          <button className="gbx-btn" onClick={handleToggleMute} title="Toggle Audio">
+          <button className="gbx-btn" onClick={handleToggleMute} title="Toggle Sound">
             {isMuted ? '🔇' : '🔊'}
           </button>
 
-          <button className="gbx-btn" onClick={onToggleExpand} title={isExpanded ? 'Collapse' : 'Expand'}>
+          <button className="gbx-btn" onClick={onToggleExpand} title={isExpanded ? 'Collapse View' : 'Expand View'}>
             {isExpanded ? '⤢' : '⤡'}
           </button>
 
-          <button className="gbx-btn exit-btn" onClick={onExit} title="Exit Game Boy">
+          <button className="gbx-btn exit-btn" onClick={onExit} title="Exit Game Boy (Esc)">
             ✕ EXIT
           </button>
         </div>
@@ -373,17 +475,26 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
         onFocus={() => {
           setIsFocused(true);
           inputRef.current?.setFocused(true);
+          engineRef.current?.resume();
         }}
-        onBlur={() => {
+        onBlur={(e) => {
+          if (e.currentTarget && e.relatedTarget && e.currentTarget.contains(e.relatedTarget)) {
+            return;
+          }
           setIsFocused(false);
-          inputRef.current?.setFocused(false);
         }}
         onClick={() => {
+          audioRef.current?.ensureContext();
           shellRef.current?.focus();
+          inputRef.current?.setFocused(true);
+          engineRef.current?.resume();
+          if (bootPhaseRef.current === 'booting') {
+            skipBoot();
+          }
         }}
       >
         {/* Screen Housing */}
-        <div className="gbx-screen-housing">
+        <div className="gbx-screen-housing" onClick={handleCanvasClick}>
           <div className="gbx-screen-top-bar">
             <div className="gbx-power-indicator">
               <span className="gbx-power-led" />
@@ -414,87 +525,106 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
           <div className="gbx-screen-bottom-bar">GAME BOY™</div>
         </div>
 
-        {/* Subtle click to focus hint if focus is lost */}
+        {/* Subtle click-to-focus warning hint if focus was lost */}
         {!isFocused && (
-          <div className="gbx-focus-hint">
-            CLICK TO FOCUS KEYBOARD
+          <div className="gbx-focus-hint" onClick={() => shellRef.current?.focus()}>
+            CLICK TO FOCUS GAME BOY
           </div>
         )}
 
-        {/* Controls Panel (D-Pad & Buttons) */}
+        {/* Controls Panel (Authentic Handheld Layout) */}
         {shouldShowTouch && (
           <div className="gbx-controls-panel">
-            {/* D-Pad */}
-            <div className="gbx-dpad-container">
-              <div />
-              <button
-                className="gbx-dpad-btn"
-                onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.UP, true); }}
-                onPointerUp={() => handleTouchButton(BUTTONS.UP, false)}
-                onPointerCancel={() => handleTouchButton(BUTTONS.UP, false)}
-                onPointerLeave={() => handleTouchButton(BUTTONS.UP, false)}
-              >
-                ▲
-              </button>
-              <div />
-              <button
-                className="gbx-dpad-btn"
-                onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.LEFT, true); }}
-                onPointerUp={() => handleTouchButton(BUTTONS.LEFT, false)}
-                onPointerCancel={() => handleTouchButton(BUTTONS.LEFT, false)}
-                onPointerLeave={() => handleTouchButton(BUTTONS.LEFT, false)}
-              >
-                ◀
-              </button>
-              <div className="gbx-dpad-center" />
-              <button
-                className="gbx-dpad-btn"
-                onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.RIGHT, true); }}
-                onPointerUp={() => handleTouchButton(BUTTONS.RIGHT, false)}
-                onPointerCancel={() => handleTouchButton(BUTTONS.RIGHT, false)}
-                onPointerLeave={() => handleTouchButton(BUTTONS.RIGHT, false)}
-              >
-                ▶
-              </button>
-              <div />
-              <button
-                className="gbx-dpad-btn"
-                onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.DOWN, true); }}
-                onPointerUp={() => handleTouchButton(BUTTONS.DOWN, false)}
-                onPointerCancel={() => handleTouchButton(BUTTONS.DOWN, false)}
-                onPointerLeave={() => handleTouchButton(BUTTONS.DOWN, false)}
-              >
-                ▼
-              </button>
-              <div />
-            </div>
-
-            {/* A & B Action Buttons */}
-            <div className="gbx-action-buttons">
-              <div className="gbx-round-btn-wrapper">
-                <button
-                  className="gbx-round-btn"
-                  onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.B, true); }}
-                  onPointerUp={() => handleTouchButton(BUTTONS.B, false)}
-                  onPointerCancel={() => handleTouchButton(BUTTONS.B, false)}
-                  onPointerLeave={() => handleTouchButton(BUTTONS.B, false)}
-                >
-                  B
-                </button>
-                <span className="gbx-btn-label">B</span>
+            <div className="gbx-primary-controls">
+              {/* D-Pad */}
+              <div className="gbx-dpad-wrapper">
+                <div className="gbx-dpad-container">
+                  <div />
+                  <button
+                    className="gbx-dpad-btn"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.UP, true); }}
+                    onPointerUp={() => handleTouchButton(BUTTONS.UP, false)}
+                    onPointerCancel={() => handleTouchButton(BUTTONS.UP, false)}
+                    onPointerLeave={() => handleTouchButton(BUTTONS.UP, false)}
+                    title="D-Pad Up (W / Up Arrow)"
+                  >
+                    ▲
+                  </button>
+                  <div />
+                  <button
+                    className="gbx-dpad-btn"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.LEFT, true); }}
+                    onPointerUp={() => handleTouchButton(BUTTONS.LEFT, false)}
+                    onPointerCancel={() => handleTouchButton(BUTTONS.LEFT, false)}
+                    onPointerLeave={() => handleTouchButton(BUTTONS.LEFT, false)}
+                    title="D-Pad Left (A / Left Arrow)"
+                  >
+                    ◀
+                  </button>
+                  <div className="gbx-dpad-center" />
+                  <button
+                    className="gbx-dpad-btn"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.RIGHT, true); }}
+                    onPointerUp={() => handleTouchButton(BUTTONS.RIGHT, false)}
+                    onPointerCancel={() => handleTouchButton(BUTTONS.RIGHT, false)}
+                    onPointerLeave={() => handleTouchButton(BUTTONS.RIGHT, false)}
+                    title="D-Pad Right (D / Right Arrow)"
+                  >
+                    ▶
+                  </button>
+                  <div />
+                  <button
+                    className="gbx-dpad-btn"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.DOWN, true); }}
+                    onPointerUp={() => handleTouchButton(BUTTONS.DOWN, false)}
+                    onPointerCancel={() => handleTouchButton(BUTTONS.DOWN, false)}
+                    onPointerLeave={() => handleTouchButton(BUTTONS.DOWN, false)}
+                    title="D-Pad Down (S / Down Arrow)"
+                  >
+                    ▼
+                  </button>
+                  <div />
+                </div>
+                <span className="gbx-control-hint">WASD / ARROWS</span>
               </div>
 
-              <div className="gbx-round-btn-wrapper">
-                <button
-                  className="gbx-round-btn"
-                  onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.A, true); }}
-                  onPointerUp={() => handleTouchButton(BUTTONS.A, false)}
-                  onPointerCancel={() => handleTouchButton(BUTTONS.A, false)}
-                  onPointerLeave={() => handleTouchButton(BUTTONS.A, false)}
-                >
-                  A
-                </button>
-                <span className="gbx-btn-label">A</span>
+              {/* Action Buttons A & B */}
+              <div className="gbx-action-buttons-wrapper">
+                <div className="gbx-action-buttons">
+                  <div className="gbx-round-btn-wrapper">
+                    <button
+                      className="gbx-round-btn"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.B, true); }}
+                      onPointerUp={() => handleTouchButton(BUTTONS.B, false)}
+                      onPointerCancel={() => handleTouchButton(BUTTONS.B, false)}
+                      onPointerLeave={() => handleTouchButton(BUTTONS.B, false)}
+                      title="B Button (X / K / Back)"
+                    >
+                      B
+                    </button>
+                    <span className="gbx-btn-label">B [X]</span>
+                  </div>
+
+                  <div className="gbx-round-btn-wrapper">
+                    <button
+                      className="gbx-round-btn"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.A, true); }}
+                      onPointerUp={() => handleTouchButton(BUTTONS.A, false)}
+                      onPointerCancel={() => handleTouchButton(BUTTONS.A, false)}
+                      onPointerLeave={() => handleTouchButton(BUTTONS.A, false)}
+                      title="A Button (Z / Space / Select)"
+                    >
+                      A
+                    </button>
+                    <span className="gbx-btn-label">A [Z]</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -503,30 +633,34 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
               <div className="gbx-pill-btn-wrapper">
                 <button
                   className="gbx-pill-btn"
+                  onMouseDown={(e) => e.preventDefault()}
                   onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.SELECT, true); }}
                   onPointerUp={() => handleTouchButton(BUTTONS.SELECT, false)}
                   onPointerCancel={() => handleTouchButton(BUTTONS.SELECT, false)}
                   onPointerLeave={() => handleTouchButton(BUTTONS.SELECT, false)}
+                  title="SELECT (Shift / Backspace)"
                 />
-                <span className="gbx-pill-label">SELECT</span>
+                <span className="gbx-pill-label">SELECT [SHIFT]</span>
               </div>
 
               <div className="gbx-pill-btn-wrapper">
                 <button
                   className="gbx-pill-btn"
+                  onMouseDown={(e) => e.preventDefault()}
                   onPointerDown={(e) => { e.preventDefault(); handleTouchButton(BUTTONS.START, true); }}
                   onPointerUp={() => handleTouchButton(BUTTONS.START, false)}
                   onPointerCancel={() => handleTouchButton(BUTTONS.START, false)}
                   onPointerLeave={() => handleTouchButton(BUTTONS.START, false)}
+                  title="START (Enter)"
                 />
-                <span className="gbx-pill-label">START</span>
+                <span className="gbx-pill-label">START [ENTER]</span>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Settings Modal */}
+      {/* Settings Modal Overlay */}
       {settingsOpen && (
         <div className="gbx-settings-overlay" onClick={() => setSettingsOpen(false)}>
           <div className="gbx-settings-card" onClick={e => e.stopPropagation()}>
@@ -548,7 +682,7 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
             </div>
 
             <div className="gbx-setting-row">
-              <span>TOUCH CONTROLS:</span>
+              <span>CONTROLS DISPLAY:</span>
               <select
                 className="gbx-setting-select"
                 value={touchSetting}
@@ -558,9 +692,9 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
                   Storage.saveSettings({ ...Storage.getSettings(), touchControls: val });
                 }}
               >
+                <option value="always">Always Show Controls</option>
                 <option value="auto">Auto (Touch Devices)</option>
-                <option value="always">Always Show</option>
-                <option value="never">Hide</option>
+                <option value="never">Hide Virtual Controls</option>
               </select>
             </div>
 
@@ -578,7 +712,7 @@ export const GameBoyHub = ({ onExit, onToggleExpand, isExpanded = false }) => {
               />
             </div>
 
-            <button className="gbx-btn" style={{ marginTop: '0.5rem' }} onClick={() => setSettingsOpen(false)}>
+            <button className="gbx-btn" style={{ marginTop: '0.6rem', width: '100%' }} onClick={() => setSettingsOpen(false)}>
               DONE
             </button>
           </div>

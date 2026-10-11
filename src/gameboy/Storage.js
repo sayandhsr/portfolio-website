@@ -81,7 +81,7 @@ export const Storage = {
       palette: 'classic', // 'classic' (green) or 'grayscale'
       soundEnabled: true,
       volume: 0.3,
-      touchControls: 'auto', // 'auto', 'always', 'never'
+      touchControls: 'always', // 'always', 'auto', 'never'
       reducedMotion: false
     };
     if (!raw) return defaults;

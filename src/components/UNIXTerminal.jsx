@@ -644,40 +644,42 @@ x/tw     : https://twitter.com/SayandhSr`;
       {/* TERMINAL WINDOW */}
       {isOpen && (
         <div className={`terminal-window ${isTerminalExpanded ? 'gbx-expanded-window' : ''}`} role="dialog" aria-label="Terminal CLI">
-          {/* WINDOW HEADER: MONOCHROME, NO CANDY DOTS */}
-          <div className="terminal-header">
-            <div className="terminal-header-title">
-              <span className="header-sym">&gt;_</span>
-              <span>sayandh@cli:~$</span>
-            </div>
+          {/* WINDOW HEADER: MONOCHROME, NO CANDY DOTS (Hidden when Game Boy provides its own header) */}
+          {!showGameBoy && (
+            <div className="terminal-header">
+              <div className="terminal-header-title">
+                <span className="header-sym">&gt;_</span>
+                <span>sayandh@cli:~$</span>
+              </div>
 
-            <div className="terminal-header-controls">
-              <button
-                type="button"
-                className="cli-btn"
-                onClick={() => toggleAudio()}
-                title="Toggle audio"
-              >
-                [AUDIO: {audioEnabled ? 'ON' : 'OFF'}]
-              </button>
-              <button
-                type="button"
-                className="cli-btn"
-                onClick={() => executeUserCommand('clear')}
-                title="Clear screen"
-              >
-                [CLEAR]
-              </button>
-              <button
-                type="button"
-                className="cli-btn close-btn"
-                onClick={toggleTerminal}
-                title="Close terminal"
-              >
-                [X]
-              </button>
+              <div className="terminal-header-controls">
+                <button
+                  type="button"
+                  className="cli-btn"
+                  onClick={() => toggleAudio()}
+                  title="Toggle audio"
+                >
+                  [AUDIO: {audioEnabled ? 'ON' : 'OFF'}]
+                </button>
+                <button
+                  type="button"
+                  className="cli-btn"
+                  onClick={() => executeUserCommand('clear')}
+                  title="Clear screen"
+                >
+                  [CLEAR]
+                </button>
+                <button
+                  type="button"
+                  className="cli-btn close-btn"
+                  onClick={toggleTerminal}
+                  title="Close terminal"
+                >
+                  [X]
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {showGameBoy ? (
             <GameBoyHub

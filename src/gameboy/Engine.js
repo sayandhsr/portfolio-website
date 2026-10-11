@@ -22,19 +22,27 @@ export class Engine {
     this.boundLoop = this.loop.bind(this);
     this.boundVisibilityChange = this.handleVisibilityChange.bind(this);
     this.boundWindowBlur = this.handleWindowBlur.bind(this);
+    this.boundWindowFocus = this.handleWindowFocus.bind(this);
 
     document.addEventListener('visibilitychange', this.boundVisibilityChange);
     window.addEventListener('blur', this.boundWindowBlur);
+    window.addEventListener('focus', this.boundWindowFocus);
   }
 
   handleVisibilityChange() {
     if (document.hidden) {
       this.pause();
+    } else {
+      this.resume();
     }
   }
 
   handleWindowBlur() {
     this.pause();
+  }
+
+  handleWindowFocus() {
+    this.resume();
   }
 
   start() {
@@ -106,5 +114,6 @@ export class Engine {
     this.stop();
     document.removeEventListener('visibilitychange', this.boundVisibilityChange);
     window.removeEventListener('blur', this.boundWindowBlur);
+    window.removeEventListener('focus', this.boundWindowFocus);
   }
 }
