@@ -19,8 +19,8 @@
 }
 
 .architect-bio {
-  font-family: var(--font-mono);
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-family: var(--font-body);
+  font-size: clamp(1.15rem, 2.5vw, 1.85rem);
   line-height: 1.6;
   font-weight: 600;
   border-left: 12px solid var(--accent-red);
