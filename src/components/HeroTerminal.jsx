@@ -1,14 +1,12 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import './HeroTerminal.css';
-import heroPortrait from '../assets/architect-portrait.jpg';
 
 const HeroTerminal = () => {
   const heroRef = useRef(null);
   const textRef = useRef(null);
   const subTextRef = useRef(null);
   const btnRef = useRef(null);
-  const portraitRef = useRef(null);
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -24,30 +22,12 @@ const HeroTerminal = () => {
       { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
       "-=0.5"
     )
-    // Seamless entrance for the blended portrait
-    .fromTo(portraitRef.current,
-      { opacity: 0, scale: 0.94 },
-      { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' },
-      "-=0.6"
-    )
     // Fade in the button
     .fromTo(btnRef.current,
       { opacity: 0, y: 40 },
       { opacity: 1, y: 0, duration: 0.5, ease: 'back.out(1.7)' },
       "-=0.3"
     );
-
-    // Subtle parallax effect on scroll
-    gsap.to(portraitRef.current, {
-      y: 60,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true
-      }
-    });
   }, []);
 
   const handleScroll = () => {
@@ -68,14 +48,6 @@ const HeroTerminal = () => {
           <button ref={btnRef} className="brutalist-button initialize-btn" onClick={handleScroll}>
             VIEW WORK
           </button>
-        </div>
-
-        <div ref={portraitRef} className="hero-portrait-container">
-          <img 
-            src={heroPortrait} 
-            alt="Sayandh Raj" 
-            className="hero-blended-image" 
-          />
         </div>
       </div>
     </section>
