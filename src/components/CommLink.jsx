@@ -26,9 +26,9 @@ const CommLink = () => {
           rel="noopener noreferrer"
           className="brutalist-button matcha-btn"
         >
-          🍵 BUY ME A MATCHA
+          SPONSOR / DONATE
         </a>
-        <p className="matcha-note" style={{marginTop: '1rem'}}>[ DIRECT SECURE TRANSFER: sayandhsr123-2@okicici ]</p>
+        <p className="matcha-note" style={{marginTop: '1rem'}}>[ DIRECT SUPPORT VIA UPI: sayandhsr123-2@okicici ]</p>
       </div>
 
       <div className="comm-grid">

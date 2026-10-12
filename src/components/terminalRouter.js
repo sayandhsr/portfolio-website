@@ -30,13 +30,13 @@ github     : https://github.com/sayandhsr
 linkedin   : https://linkedin.com/in/sayandh-raj
 credly     : https://credly.com/users/sayandhraj`,
 
-  SKILLS: `[TECHNICAL ARSENAL]
+  SKILLS: `[TECHNICAL SKILLS]
 ai / ml    : PyTorch, TensorFlow, Deep Neural Networks, NLP, OpenCV
 gen ai     : LangChain, Hugging Face, RAG Architecture, OpenRouter
 analytics  : Pandas, NumPy, Scikit-Learn, Power BI, Tableau, SQL, R
 systems    : FastAPI, Docker, Firebase, Supabase, Git, Vercel`,
 
-  PROJECTS: `[DEPLOYMENTS]
+  PROJECTS: `[PROJECTS]
 1. Unsullied Code - Offline-first mobile IDE with true AST engine
    url: https://unsulliedcode.vercel.app/
 2. KILL SWITCH - Brutalist smoking community platform
@@ -104,7 +104,7 @@ linkedin : https://linkedin.com/in/sayandh-raj
 kaggle   : https://kaggle.com/sayandhsr
 x/tw     : https://twitter.com/SayandhSr`,
 
-  MATCHA: `[BUY A MATCHA]\nprotocol : direct UPI\nupi id   : sayandhsr123-2@okicici\npayee    : Sayandh Raj\nlink     : upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR`,
+  MATCHA: `[SPONSOR / DONATE]\nmethod   : direct UPI\nupi id   : sayandhsr123-2@okicici\npayee    : Sayandh Raj\nlink     : upi://pay?pa=sayandhsr123-2@okicici&pn=Sayandh%20Raj&cu=INR`,
 
   PROFANITY: `get a life instead of ragebaiting with a bot.`
 };
@@ -150,7 +150,7 @@ export const classifyTerminalCommand = (rawInput) => {
   }
 
   // 3. MATCHA / TIP
-  if (['tip', 'donate', 'matcha', 'coffee', 'buy matcha'].includes(cleanCmd) || rawInput.trim() === '> execute tip_matcha.sh') {
+  if (['tip', 'donate', 'sponsor', 'support', 'matcha', 'coffee', 'buy matcha'].includes(cleanCmd) || rawInput.trim() === '> execute tip_matcha.sh') {
     return { type: 'MATCHA' };
   }
 

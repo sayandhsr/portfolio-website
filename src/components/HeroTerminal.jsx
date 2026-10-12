@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import './HeroTerminal.css';
-import heroPortrait from '../assets/architect-hero.jpg';
+import heroPortrait from '../assets/architect-portrait.jpg';
 
 const HeroTerminal = () => {
   const heroRef = useRef(null);
@@ -63,11 +63,10 @@ const HeroTerminal = () => {
       
       <div className="hero-wrapper">
         <div className="hero-content">
-          <div className="hero-meta-badge">SYSTEM PROTOCOL // DEPLOYED</div>
           <h1 ref={textRef} className="massive-headline">SAYANDH RAJ</h1>
           <h2 ref={subTextRef} className="sub-headline">AI/ML ENGINEER & DATA ARCHITECT</h2>
           <button ref={btnRef} className="brutalist-button initialize-btn" onClick={handleScroll}>
-            INITIALIZE PROTOCOL
+            VIEW WORK
           </button>
         </div>
 

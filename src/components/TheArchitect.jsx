@@ -30,7 +30,7 @@ const TheArchitect = () => {
 
   return (
     <section id="architect-section" ref={sectionRef} className="section-container architect-section">
-      <h2 ref={headerRef} className="section-header">THE ARCHITECT</h2>
+      <h2 ref={headerRef} className="section-header">ABOUT ME</h2>
       <div className="architect-content">
         <p ref={textRef} className="architect-bio">
           "I engineer intelligent systems and architect robust, scalable machine learning solutions. 

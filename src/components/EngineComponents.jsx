@@ -35,7 +35,7 @@ const EngineComponents = () => {
 
   return (
     <section ref={sectionRef} className="section-container engine-section">
-      <h2 className="section-header">ENGINE COMPONENTS</h2>
+      <h2 className="section-header">TECHNICAL SKILLS</h2>
       <div className="skills-container">
         {skillCategories.map((cat, idx) => (
           <div 

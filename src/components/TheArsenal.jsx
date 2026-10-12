@@ -37,7 +37,7 @@ const TheArsenal = () => {
 
   return (
     <section ref={sectionRef} className="section-container arsenal-section">
-      <h2 className="section-header dark-bg-header">THE ARSENAL</h2>
+      <h2 className="section-header dark-bg-header">PROJECTS</h2>
       <div className="masonry-grid">
         {projects.map((proj, idx) => (
           <a 
@@ -52,7 +52,7 @@ const TheArsenal = () => {
             <div className="card-id">PRJ_{idx < 9 ? '0' : ''}{idx + 1}</div>
             <h3 className="card-title">{proj.title}</h3>
             <div className="card-overlay">
-              <span>VIEW LOGS</span>
+              <span>VIEW PROJECT</span>
             </div>
           </a>
         ))}

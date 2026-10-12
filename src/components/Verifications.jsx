@@ -67,10 +67,10 @@ const Verifications = () => {
     <section id="verifications" ref={sectionRef} className="section-container verifications-section">
       <div className="verifications-header-wrap">
         <div className="verifications-meta">
-          <span>04 // VERIFICATIONS</span>
+          <span>04 // CERTIFICATIONS</span>
           <span className="meta-icon">↘</span>
         </div>
-        <h2 className="section-header dark-bg-header">VERIFICATIONS</h2>
+        <h2 className="section-header dark-bg-header">CERTIFICATIONS</h2>
       </div>
 
       {/* TOP: ACHIEVEMENTS / 3 BADGES + MORE REDIRECT */}
