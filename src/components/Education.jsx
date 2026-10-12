@@ -111,36 +111,39 @@ const Education = () => {
     <section id="education-section" ref={sectionRef} className="section-container education-section">
       <h2 className="section-header dark-bg-header">EDUCATION</h2>
 
-      <div className="education-grid">
+      <div className="education-stack">
         {educationList.map((item, idx) => (
           <article
             key={idx}
             className="education-card"
             ref={el => (cardsRef.current[idx] = el)}
           >
-            {/* University Logo Showcase */}
-            <div className="edu-logo-wrapper" style={{ padding: item.logoPadding }}>
-              <img
-                src={item.logo}
-                alt={item.logoAlt}
-                className="edu-logo-img"
-                loading="lazy"
-              />
+            {/* Top Bar: Small Curved Square Logo + Header Content */}
+            <div className="edu-card-top">
+              <div className="edu-logo-badge">
+                <img
+                  src={item.logo}
+                  alt={item.logoAlt}
+                  className="edu-logo-img"
+                  loading="lazy"
+                />
+              </div>
+
+              <div className="edu-top-info">
+                <div className="edu-title-and-meta">
+                  <div className="edu-degree-group">
+                    <h3 className="edu-degree-title">{item.degree}</h3>
+                    <div className="edu-major-name">{item.major}</div>
+                  </div>
+                  <div className="edu-card-meta">
+                    <span className="edu-meta-status">{item.status}</span>
+                    <span className="edu-meta-period">{item.period}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Status & Period Metadata - Clean text below logo, no boxes */}
-            <div className="edu-card-meta">
-              <span className="edu-meta-status">{item.status}</span>
-              <span className="edu-meta-period">{item.period}</span>
-            </div>
-
-            {/* Degree and Major */}
-            <div className="edu-title-group">
-              <h3 className="edu-degree-title">{item.degree}</h3>
-              <div className="edu-major-name">{item.major}</div>
-            </div>
-
-            {/* University Details */}
+            {/* Institution Details */}
             <div className="edu-institution-info">
               <div className="edu-inst-main">{item.institution}</div>
               {item.universityAlias && (
@@ -161,7 +164,7 @@ const Education = () => {
                 <div className="edu-partners-grid">
                   {item.partners.map((partner, pIdx) => (
                     <div key={pIdx} className="edu-partner-card">
-                      <div className="edu-partner-logo-box" style={{ padding: partner.padding }}>
+                      <div className="edu-partner-logo-box">
                         <img
                           src={partner.logo}
                           alt={partner.logoAlt}

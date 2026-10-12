@@ -4,19 +4,20 @@
   padding-bottom: 6rem;
 }
 
-.education-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+.education-stack {
+  display: flex;
+  flex-direction: column;
   gap: 2.5rem;
   width: 100%;
-  margin-top: 2rem;
+  max-width: 1100px;
+  margin: 2.5rem auto 0;
 }
 
 .education-card {
   background: #0d0d0d;
   border: 2px solid #27272a;
   box-shadow: 8px 8px 0px var(--concrete-white);
-  padding: 2.2rem;
+  padding: 2.2rem 2.5rem;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -32,60 +33,60 @@
   border-color: #3f3f46;
 }
 
-/* University Logo Container (Top of Card) */
-.edu-logo-wrapper {
+/* Top Row: Small Curved Square Logo Badge + Header Content */
+.edu-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edu-logo-badge {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
   background: #ffffff;
-  border: 1px solid #e4e4e7;
-  border-radius: 2px;
-  height: 90px;
+  border-radius: 14px; /* Curved edges square */
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  border: 2px solid #e4e4e7;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .edu-logo-img {
-  max-height: 100%;
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
 
-/* Clean Metadata Bar (Below Logo, No Boxes) */
-.edu-card-meta {
+.edu-top-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.edu-title-and-meta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1.25rem;
+  gap: 1rem;
 }
 
-.edu-meta-status {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #c49a6c; /* Warm coffee crema */
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.edu-meta-period {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #ffffff; /* Crisp white */
-  letter-spacing: 0.03em;
-}
-
-/* Degree & Major - Clear, Uncompressed Typography */
-.edu-title-group {
-  margin-bottom: 1.25rem;
+.edu-degree-group {
+  flex: 1;
+  min-width: 250px;
 }
 
 .edu-degree-title {
   font-family: var(--font-body);
-  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
@@ -102,31 +103,60 @@
   letter-spacing: 0.02em;
 }
 
+/* Status & Period Metadata */
+.edu-card-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.edu-meta-status {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #c49a6c; /* Warm coffee crema */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(196, 154, 108, 0.12);
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid rgba(196, 154, 108, 0.3);
+}
+
+.edu-meta-period {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+}
+
 /* Institution Details */
 .edu-institution-info {
-  margin-bottom: 1.4rem;
-  padding-left: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1rem;
   border-left: 3px solid #8b5a2b;
 }
 
 .edu-inst-main {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.4;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.25rem;
 }
 
 .edu-inst-sub {
   font-size: 0.92rem;
   font-weight: 500;
   color: #e4e4e7;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .edu-inst-note {
   font-size: 0.86rem;
-  color: #d4d4d8;
+  color: #a1a1aa;
   line-height: 1.45;
 }
 
@@ -134,14 +164,14 @@
 .edu-overview {
   font-size: 0.95rem;
   line-height: 1.65;
-  color: #e4e4e7;
-  margin-bottom: 1.6rem;
+  color: #d4d4d8;
+  margin-bottom: 1.5rem;
 }
 
 /* Academic Industrial Partners Block */
 .edu-partners-container {
-  margin-top: auto;
-  padding-top: 1.4rem;
+  margin-top: 0.5rem;
+  padding-top: 1.25rem;
   border-top: 1px dashed #27272a;
 }
 
@@ -157,18 +187,18 @@
 
 .edu-partners-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
 .edu-partner-card {
   background: #141414;
   border: 1px solid #27272a;
-  border-radius: 2px;
-  padding: 0.75rem;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  align-items: center;
+  gap: 1rem;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -179,11 +209,15 @@
 
 .edu-partner-logo-box {
   background: #ffffff;
-  border-radius: 2px;
+  border-radius: 8px; /* Curved edges square */
+  width: 54px;
   height: 42px;
+  min-width: 54px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .edu-partner-logo {
@@ -214,9 +248,9 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .education-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .education-stack {
+    gap: 1.75rem;
+    margin-top: 1.5rem;
   }
 
   .education-card {
@@ -229,8 +263,28 @@
     box-shadow: 6px 6px 0px var(--concrete-white);
   }
 
-  .edu-logo-wrapper {
-    height: 75px;
+  .edu-card-top {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .edu-title-and-meta {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .edu-card-meta {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .edu-logo-badge {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
   }
 
   .edu-partners-grid {
